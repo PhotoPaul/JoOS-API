@@ -33,7 +33,7 @@ class PDFService {
                         $this->HR();
                     }
                     $this->VR(1);
-                    $this->pdf->Cell(5,10,isset($child->answer) ? "√" : "");
+                    $this->pdf->Cell(5,10,(isset($child->answer) || (isset($question->answer) && $child->questionId === $question->answer)) ? "√" : "");
                     $this->VR(1);
                     if($i % 4 !== 3) {
                         $this->pdf->Cell(42,10,$child->{'title_'.$language});
