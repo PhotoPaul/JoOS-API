@@ -596,6 +596,34 @@ class Applications {
             $return["application"]->financialApproval = isset($return["application"]->financialApproval) ? booleanize($return["application"]->financialApproval) : null;
             $return["application"]->debtApproval = isset($return["application"]->debtApproval) ? booleanize($return["application"]->debtApproval) : null;
             return new AjaxResponse($return);
+        } elseif($params->applicationId === 23) { // General Application
+            if(!(
+                $this->auth->authenticateOperation('getUserApplicationFormModelForOthers') ||
+                $this->auth->authenticateOperation('getUserApplicationFormModelForOthersFinancial')
+            )) {
+                $params->userId = $this->user->id;
+            }
+            $columns = [
+                'applicationStatus',
+                'whyApply',
+                'churchName',
+                'pastorName',
+                'ministryInvolvement',
+                'personalStatement',
+                'statementOfFaithApproval'
+            ];
+            $joins = 'LEFT JOIN admin_applications_general ON admin_applications_general.userId = admin_user_applications.userId';
+            $return["application"] = $this->db2->sql1([
+                'statement' => 'SELECT',
+                'columns' => $columns,
+                'table' => 'admin_user_applications',
+                'joins' => $joins,
+                'where' => ['admin_user_applications.userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
+            ]);
+            if (isset($return["application"])) {
+                $return["application"]->statementOfFaithApproval = isset($return["application"]->statementOfFaithApproval) ? booleanize($return["application"]->statementOfFaithApproval) : null;
+            }
+            return new AjaxResponse($return);
         }
 
         $return["application"] = $this->db2->sql1([
@@ -1070,6 +1098,22 @@ class Applications {
                     'feeUrl'
                 ],
                 'values' => [$params->userId, $params->application->applicationFee, $params->application->feeUrl],
+                'update' => true
+            ]);
+        } elseif($params->applicationId === 23) { // General Application
+            $result = $this->db2->sql([
+                'statement' => 'INSERT INTO',
+                'table' => 'admin_applications_general',
+                'columns' => [
+                    'userId',
+                    'whyApply',
+                    'churchName',
+                    'pastorName',
+                    'ministryInvolvement',
+                    'personalStatement',
+                    'statementOfFaithApproval'
+                ],
+                'values' => [$params->userId, $params->application->whyApply, $params->application->churchName, $params->application->pastorName, $params->application->ministryInvolvement, $params->application->personalStatement, $params->application->statementOfFaithApproval],
                 'update' => true
             ]);
         } else {
