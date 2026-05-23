@@ -31,6 +31,8 @@ class Applications {
                 'lastName',
                 'birthDate',
                 'birthPlace',
+                'fatherName',
+                'motherName',
                 'email',
                 'phone',
                 'occupation',
@@ -649,6 +651,8 @@ class Applications {
                     'userId',
                     'birthDate',
                     'birthPlace',
+                    'fatherName',
+                    'motherName',
                     'phone',
                     'occupation',
                     'greekCitizen',
@@ -680,7 +684,7 @@ class Applications {
                     'guardianCountry',
                     'guardianOpinion'
                 ],
-                'values' => [$params->userId, $params->application->birthDate, $params->application->birthPlace, $params->application->phone, $params->application->occupation, $params->application->greekCitizen, $params->application->greekIdNumber, $params->application->greekSsn, $params->application->irsOffice, $params->application->citizenship, $params->application->euCitizen, $params->application->passportNumber, $params->application->residencePermit, $params->application->familyStatus, $params->application->familySpouseFirstName, $params->application->familySpouseLastName, $params->application->familyKids, $params->application->familyKidsNamesAges, $params->application->address, $params->application->city, $params->application->zipCode, $params->application->country, $params->application->guardianFirstName, $params->application->guardianLastName, $params->application->guardianOccupation, $params->application->guardianEmail, $params->application->guardianPhone, $params->application->guardianAddressSame, $params->application->guardianAddress, $params->application->guardianCity, $params->application->guardianZipCode, $params->application->guardianCountry, $params->application->guardianOpinion],
+                'values' => [$params->userId, $params->application->birthDate, $params->application->birthPlace, $params->application->fatherName, $params->application->motherName, $params->application->phone, $params->application->occupation, $params->application->greekCitizen, $params->application->greekIdNumber, $params->application->greekSsn, $params->application->irsOffice, $params->application->citizenship, $params->application->euCitizen, $params->application->passportNumber, $params->application->residencePermit, $params->application->familyStatus, $params->application->familySpouseFirstName, $params->application->familySpouseLastName, $params->application->familyKids, $params->application->familyKidsNamesAges, $params->application->address, $params->application->city, $params->application->zipCode, $params->application->country, $params->application->guardianFirstName, $params->application->guardianLastName, $params->application->guardianOccupation, $params->application->guardianEmail, $params->application->guardianPhone, $params->application->guardianAddressSame, $params->application->guardianAddress, $params->application->guardianCity, $params->application->guardianZipCode, $params->application->guardianCountry, $params->application->guardianOpinion],
                 'update' => true
             ]);
         } elseif($params->applicationId === 2) { // Greek Education
