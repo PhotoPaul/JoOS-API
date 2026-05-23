@@ -738,6 +738,9 @@ class Admissions {
             $this->clientModel->healthFormModel->drugsUseModel->drugsUse = booleanize($serverModel->drugsUse);
             $this->clientModel->healthFormModel->drugsUseModel->drugsUseDetails = $serverModel->drugsUseDetails;
 
+            $this->clientModel->healthFormModel->currentHealthModel->learningDifficulties = $serverModel->learningDifficulties;
+            $this->clientModel->healthFormModel->currentHealthModel->healthAccessibilityCircumstances = $serverModel->healthAccessibilityCircumstances;
+
             $this->clientModel->healthFormModel->currentHealthModel->currentDiseases = booleanize($serverModel->currentDiseases);
             $this->clientModel->healthFormModel->currentHealthModel->currentDiseasesDetails = $serverModel->currentDiseasesDetails;
             $this->clientModel->healthFormModel->currentHealthModel->currentSymptoms = booleanize($serverModel->currentSymptoms);
@@ -794,6 +797,8 @@ class Admissions {
             $this->serverModel[] = isset($clientModel->healthFormModel->healthHistoryModel->otherVaccinesDetails)? $clientModel->healthFormModel->healthHistoryModel->otherVaccinesDetails: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->drugsUseModel->drugsUse)? $clientModel->healthFormModel->drugsUseModel->drugsUse: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->drugsUseModel->drugsUseDetails)? $clientModel->healthFormModel->drugsUseModel->drugsUseDetails: null;
+            $this->serverModel[] = isset($clientModel->healthFormModel->currentHealthModel->learningDifficulties)? $clientModel->healthFormModel->currentHealthModel->learningDifficulties: null;
+            $this->serverModel[] = isset($clientModel->healthFormModel->currentHealthModel->healthAccessibilityCircumstances)? $clientModel->healthFormModel->currentHealthModel->healthAccessibilityCircumstances: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->currentHealthModel->currentDiseases)? $clientModel->healthFormModel->currentHealthModel->currentDiseases: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->currentHealthModel->currentDiseasesDetails)? $clientModel->healthFormModel->currentHealthModel->currentDiseasesDetails: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->currentHealthModel->currentSymptoms)? $clientModel->healthFormModel->currentHealthModel->currentSymptoms: null;
@@ -842,6 +847,7 @@ class Admissions {
             $this->clientModel = (object) [
                 "educationFormModel" => (object) [
                     "primarySecondaryFormModel" => new stdClass(),
+                    "computerUseFormModel" => new stdClass(),
                     "languagesFormModel" => new stdClass(),
                     "higherFormModel" => new stdClass()
                 ]
@@ -854,6 +860,12 @@ class Admissions {
             $this->clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolName = $serverModel->secondarySchoolName;
             $this->clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolGraduationYear = $serverModel->secondarySchoolGraduationYear;
             $this->clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolDiscipline = $serverModel->secondarySchoolDiscipline;
+
+            $this->clientModel->educationFormModel->computerUseFormModel->computerFluency = $serverModel->computerFluency;
+            $this->clientModel->educationFormModel->computerUseFormModel->computerAccess = $serverModel->computerAccess;
+            $this->clientModel->educationFormModel->computerUseFormModel->internetAccess = $serverModel->internetAccess;
+            $this->clientModel->educationFormModel->computerUseFormModel->wordProcessingFluency = $serverModel->wordProcessingFluency;
+            $this->clientModel->educationFormModel->computerUseFormModel->presentationFluency = $serverModel->presentationFluency;
 
             $this->clientModel->educationFormModel->languagesFormModel->greek = $serverModel->greek;
             $this->clientModel->educationFormModel->languagesFormModel->english = $serverModel->english;
@@ -877,6 +889,12 @@ class Admissions {
             $this->serverModel[] = isset($clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolName)? $clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolName: null;
             $this->serverModel[] = isset($clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolGraduationYear)? $clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolGraduationYear: null;
             $this->serverModel[] = isset($clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolDiscipline)? $clientModel->educationFormModel->primarySecondaryFormModel->secondarySchoolDiscipline: null;
+
+            $this->serverModel[] = isset($clientModel->educationFormModel->computerUseFormModel->computerFluency)? $clientModel->educationFormModel->computerUseFormModel->computerFluency: null;
+            $this->serverModel[] = isset($clientModel->educationFormModel->computerUseFormModel->computerAccess)? $clientModel->educationFormModel->computerUseFormModel->computerAccess: null;
+            $this->serverModel[] = isset($clientModel->educationFormModel->computerUseFormModel->internetAccess)? $clientModel->educationFormModel->computerUseFormModel->internetAccess: null;
+            $this->serverModel[] = isset($clientModel->educationFormModel->computerUseFormModel->wordProcessingFluency)? $clientModel->educationFormModel->computerUseFormModel->wordProcessingFluency: null;
+            $this->serverModel[] = isset($clientModel->educationFormModel->computerUseFormModel->presentationFluency)? $clientModel->educationFormModel->computerUseFormModel->presentationFluency: null;
 
             $this->serverModel[] = isset($clientModel->educationFormModel->languagesFormModel->greek)? $clientModel->educationFormModel->languagesFormModel->greek: null;
             $this->serverModel[] = isset($clientModel->educationFormModel->languagesFormModel->english)? $clientModel->educationFormModel->languagesFormModel->english: null;

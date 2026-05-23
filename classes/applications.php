@@ -79,9 +79,15 @@ class Applications {
                 'elementaryGraduationYear',
                 'middleSchoolName',
                 'middleSchoolGraduationYear',
+                'secondarySchoolGraduate',
                 'secondarySchoolName',
                 'secondarySchoolGraduationYear',
                 'secondarySchoolDiscipline',
+                'computerFluency',
+                'computerAccess',
+                'internetAccess',
+                'wordProcessingFluency',
+                'presentationFluency',
                 'greek',
                 'english',
                 'communityCollegeName',
@@ -129,6 +135,8 @@ class Applications {
                 'otherVaccinesDetails',
                 'drugsUse',
                 'drugsUseDetails',
+                'learningDifficulties',
+                'healthAccessibilityCircumstances',
                 'currentDiseases',
                 'currentDiseasesDetails',
                 'currentSymptoms',
@@ -701,6 +709,11 @@ class Applications {
                     'secondarySchoolName',
                     'secondarySchoolGraduationYear',
                     'secondarySchoolDiscipline',
+                    'computerFluency',
+                    'computerAccess',
+                    'internetAccess',
+                    'wordProcessingFluency',
+                    'presentationFluency',
                     'greek',
                     'english',
                     'communityCollegeName',
@@ -713,7 +726,7 @@ class Applications {
                     'graduateSchoolGraduationYear',
                     'graduateSchoolDiscipline'
                 ],
-                'values' => [$params->userId, $params->application->elementaryName, $params->application->elementaryGraduationYear, $params->application->middleSchoolName, $params->application->middleSchoolGraduationYear, $params->application->secondarySchoolGraduate, $params->application->secondarySchoolName, $params->application->secondarySchoolGraduationYear, $params->application->secondarySchoolDiscipline, $params->application->greek, $params->application->english, $params->application->communityCollegeName, $params->application->communityCollegeGraduationYear, $params->application->communityCollegeDiscipline, $params->application->collegeName, $params->application->collegeGraduationYear, $params->application->collegeDiscipline, $params->application->graduateSchoolName, $params->application->graduateSchoolGraduationYear, $params->application->graduateSchoolDiscipline],
+                'values' => [$params->userId, $params->application->elementaryName, $params->application->elementaryGraduationYear, $params->application->middleSchoolName, $params->application->middleSchoolGraduationYear, $params->application->secondarySchoolGraduate, $params->application->secondarySchoolName, $params->application->secondarySchoolGraduationYear, $params->application->secondarySchoolDiscipline, $params->application->computerFluency, $params->application->computerAccess, $params->application->internetAccess, $params->application->wordProcessingFluency, $params->application->presentationFluency, $params->application->greek, $params->application->english, $params->application->communityCollegeName, $params->application->communityCollegeGraduationYear, $params->application->communityCollegeDiscipline, $params->application->collegeName, $params->application->collegeGraduationYear, $params->application->collegeDiscipline, $params->application->graduateSchoolName, $params->application->graduateSchoolGraduationYear, $params->application->graduateSchoolDiscipline],
                 'update' => true
             ]);
         } elseif($params->applicationId === 3) { // Greek Health
@@ -750,6 +763,8 @@ class Applications {
                     'otherVaccinesDetails',
                     'drugsUse',
                     'drugsUseDetails',
+                    'learningDifficulties',
+                    'healthAccessibilityCircumstances',
                     'currentDiseases',
                     'currentDiseasesDetails',
                     'currentSymptoms',
@@ -775,7 +790,7 @@ class Applications {
                     'doctorContactApproval',
                     'otherDoctorContactApproval'
                 ],
-                'values' => [$params->userId, $params->application->tonsillitis, $params->application->chickenPox, $params->application->bronchialAsthma, $params->application->diphtheria, $params->application->epilepsy, $params->application->rubella, $params->application->measles, $params->application->yellowFever, $params->application->meningitis, $params->application->mumps, $params->application->polio, $params->application->cholera, $params->application->heartAbnormality, $params->application->otherDiseases, $params->application->otherDiseasesDetails, $params->application->vaccineDiphtheria, $params->application->vaccinePertussis, $params->application->vaccineTetanus, $params->application->vaccineSmallpox, $params->application->vaccineRubella, $params->application->vaccineMeasles, $params->application->vaccineMumps, $params->application->vaccinePolio, $params->application->vaccineCholera, $params->application->otherVaccines, $params->application->otherVaccinesDetails, $params->application->drugsUse, $params->application->drugsUseDetails, $params->application->currentDiseases, $params->application->currentDiseasesDetails, $params->application->currentSymptoms, $params->application->currentSymptomsDetails, $params->application->currentMedicines, $params->application->currentMedicinesDetails, $params->application->foodAllergy, $params->application->foodAllergyDetails, $params->application->firstEmergencyContactFirstName, $params->application->firstEmergencyContactLastName, $params->application->firstEmergencyContactPhone, $params->application->secondEmergencyContactFirstName, $params->application->secondEmergencyContactLastName, $params->application->secondEmergencyContactPhone, $params->application->doctor, $params->application->doctorFirstName, $params->application->doctorLastName, $params->application->doctorPhone, $params->application->doctorAddress, $params->application->doctorCity, $params->application->doctorZipCode, $params->application->doctorCountry, $params->application->doctorContactApproval, $params->application->otherDoctorContactApproval],
+                'values' => [$params->userId, $params->application->tonsillitis, $params->application->chickenPox, $params->application->bronchialAsthma, $params->application->diphtheria, $params->application->epilepsy, $params->application->rubella, $params->application->measles, $params->application->yellowFever, $params->application->meningitis, $params->application->mumps, $params->application->polio, $params->application->cholera, $params->application->heartAbnormality, $params->application->otherDiseases, $params->application->otherDiseasesDetails, $params->application->vaccineDiphtheria, $params->application->vaccinePertussis, $params->application->vaccineTetanus, $params->application->vaccineSmallpox, $params->application->vaccineRubella, $params->application->vaccineMeasles, $params->application->vaccineMumps, $params->application->vaccinePolio, $params->application->vaccineCholera, $params->application->otherVaccines, $params->application->otherVaccinesDetails, $params->application->drugsUse, $params->application->drugsUseDetails, $params->application->learningDifficulties, $params->application->healthAccessibilityCircumstances, $params->application->currentDiseases, $params->application->currentDiseasesDetails, $params->application->currentSymptoms, $params->application->currentSymptomsDetails, $params->application->currentMedicines, $params->application->currentMedicinesDetails, $params->application->foodAllergy, $params->application->foodAllergyDetails, $params->application->firstEmergencyContactFirstName, $params->application->firstEmergencyContactLastName, $params->application->firstEmergencyContactPhone, $params->application->secondEmergencyContactFirstName, $params->application->secondEmergencyContactLastName, $params->application->secondEmergencyContactPhone, $params->application->doctor, $params->application->doctorFirstName, $params->application->doctorLastName, $params->application->doctorPhone, $params->application->doctorAddress, $params->application->doctorCity, $params->application->doctorZipCode, $params->application->doctorCountry, $params->application->doctorContactApproval, $params->application->otherDoctorContactApproval],
                 'update' => true
             ]);
         } elseif($params->applicationId === 4) { // Greek Christian Life
