@@ -697,6 +697,7 @@ class Applications {
                     'elementaryGraduationYear',
                     'middleSchoolName',
                     'middleSchoolGraduationYear',
+                    'secondarySchoolGraduate',
                     'secondarySchoolName',
                     'secondarySchoolGraduationYear',
                     'secondarySchoolDiscipline',
@@ -712,7 +713,7 @@ class Applications {
                     'graduateSchoolGraduationYear',
                     'graduateSchoolDiscipline'
                 ],
-                'values' => [$params->userId, $params->application->elementaryName, $params->application->elementaryGraduationYear, $params->application->middleSchoolName, $params->application->middleSchoolGraduationYear, $params->application->secondarySchoolName, $params->application->secondarySchoolGraduationYear, $params->application->secondarySchoolDiscipline, $params->application->greek, $params->application->english, $params->application->communityCollegeName, $params->application->communityCollegeGraduationYear, $params->application->communityCollegeDiscipline, $params->application->collegeName, $params->application->collegeGraduationYear, $params->application->collegeDiscipline, $params->application->graduateSchoolName, $params->application->graduateSchoolGraduationYear, $params->application->graduateSchoolDiscipline],
+                'values' => [$params->userId, $params->application->elementaryName, $params->application->elementaryGraduationYear, $params->application->middleSchoolName, $params->application->middleSchoolGraduationYear, $params->application->secondarySchoolGraduate, $params->application->secondarySchoolName, $params->application->secondarySchoolGraduationYear, $params->application->secondarySchoolDiscipline, $params->application->greek, $params->application->english, $params->application->communityCollegeName, $params->application->communityCollegeGraduationYear, $params->application->communityCollegeDiscipline, $params->application->collegeName, $params->application->collegeGraduationYear, $params->application->collegeDiscipline, $params->application->graduateSchoolName, $params->application->graduateSchoolGraduationYear, $params->application->graduateSchoolDiscipline],
                 'update' => true
             ]);
         } elseif($params->applicationId === 3) { // Greek Health
