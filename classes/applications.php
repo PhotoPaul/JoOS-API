@@ -335,7 +335,9 @@ class Applications {
                 'sponsors',
                 'sponsorsTotal',
                 'debtApproval',
-                'deposit'
+                'deposit',
+                'programInterested',
+                'programInterestedDetails'
             ];
             $joins = 'LEFT JOIN admin_applications_financial ON admin_applications_financial.userId = admin_user_applications.userId';
             $return["application"] = $this->db2->sql1([
@@ -1078,9 +1080,11 @@ class Applications {
                     'sponsors',
                     'sponsorsTotal',
                     'debtApproval',
-                    'deposit'
+                    'deposit',
+                    'programInterested',
+                    'programInterestedDetails'
                 ],
-                'values' => [$params->userId, $params->application->studentPackage, $params->application->financialApproval, $params->application->selfPaid, $params->application->sponsors, $params->application->sponsorsTotal, $params->application->debtApproval, $params->application->deposit],
+                'values' => [$params->userId, $params->application->studentPackage, $params->application->financialApproval, $params->application->selfPaid, $params->application->sponsors, $params->application->sponsorsTotal, $params->application->debtApproval, $params->application->deposit, isset($params->application->programInterested)? $params->application->programInterested: null, isset($params->application->programInterestedDetails)? $params->application->programInterestedDetails: null],
                 'update' => true
             ]);
         } elseif($params->applicationId === 7) { // ISP Personal
