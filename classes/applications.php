@@ -36,6 +36,7 @@ class Applications {
                 'email',
                 'phone',
                 'occupation',
+                'sex',
                 'greekCitizen',
                 'greekIdNumber',
                 'greekSsn',
@@ -107,6 +108,7 @@ class Applications {
             }
             $columns = [
                 'applicationStatus',
+                // Legacy Greek form disease fields (kept for backwards compatibility)
                 'tonsillitis',
                 'chickenPox',
                 'bronchialAsthma',
@@ -122,6 +124,7 @@ class Applications {
                 'heartAbnormality',
                 'otherDiseases',
                 'otherDiseasesDetails',
+                // Legacy Greek form vaccine fields (kept for backwards compatibility)
                 'vaccineDiphtheria',
                 'vaccinePertussis',
                 'vaccineTetanus',
@@ -133,6 +136,30 @@ class Applications {
                 'vaccineCholera',
                 'otherVaccines',
                 'otherVaccinesDetails',
+                // General application disease fields
+                'tuberculosis',
+                'pneumonia',
+                'asthma',
+                'heartDiseases',
+                'hypertension',
+                'gastricUlcer',
+                'kidneyDiseases',
+                'diabetes',
+                'liverDiseases',
+                'rheumatism',
+                'anemia',
+                'cancer',
+                'physicalDisability',
+                'gallbladderDiseases',
+                // General application vaccine fields
+                'tetanusVaccine',
+                'diphtheriaVaccine',
+                'pertussisVaccine',
+                'polioVaccine',
+                'measlesVaccine',
+                'mumpsVaccine',
+                'rubellaVaccine',
+                // Shared fields
                 'drugsUse',
                 'drugsUseDetails',
                 'learningDifficulties',
@@ -148,9 +175,11 @@ class Applications {
                 'firstEmergencyContactFirstName',
                 'firstEmergencyContactLastName',
                 'firstEmergencyContactPhone',
+                'firstEmergencyContactRelationship',
                 'secondEmergencyContactFirstName',
                 'secondEmergencyContactLastName',
                 'secondEmergencyContactPhone',
+                'secondEmergencyContactRelationship',
                 'doctor',
                 'doctorFirstName',
                 'doctorLastName',
@@ -170,6 +199,7 @@ class Applications {
                 'joins' => $joins,
                 'where' => ['admin_user_applications.userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
             ]);
+            // Booleanize legacy Greek form disease fields
             $return["application"]->tonsillitis = booleanize($return["application"]->tonsillitis);
             $return["application"]->chickenPox = booleanize($return["application"]->chickenPox);
             $return["application"]->bronchialAsthma = booleanize($return["application"]->bronchialAsthma);
@@ -183,6 +213,7 @@ class Applications {
             $return["application"]->polio = booleanize($return["application"]->polio);
             $return["application"]->cholera = booleanize($return["application"]->cholera);
             $return["application"]->heartAbnormality = booleanize($return["application"]->heartAbnormality);
+            // Booleanize legacy Greek form vaccine fields
             $return["application"]->vaccineDiphtheria = booleanize($return["application"]->vaccineDiphtheria);
             $return["application"]->vaccinePertussis = booleanize($return["application"]->vaccinePertussis);
             $return["application"]->vaccineTetanus = booleanize($return["application"]->vaccineTetanus);
@@ -192,6 +223,29 @@ class Applications {
             $return["application"]->vaccineMumps = booleanize($return["application"]->vaccineMumps);
             $return["application"]->vaccinePolio = booleanize($return["application"]->vaccinePolio);
             $return["application"]->vaccineCholera = booleanize($return["application"]->vaccineCholera);
+            // Booleanize general application disease fields
+            $return["application"]->tuberculosis = booleanize($return["application"]->tuberculosis);
+            $return["application"]->pneumonia = booleanize($return["application"]->pneumonia);
+            $return["application"]->asthma = booleanize($return["application"]->asthma);
+            $return["application"]->heartDiseases = booleanize($return["application"]->heartDiseases);
+            $return["application"]->hypertension = booleanize($return["application"]->hypertension);
+            $return["application"]->gastricUlcer = booleanize($return["application"]->gastricUlcer);
+            $return["application"]->kidneyDiseases = booleanize($return["application"]->kidneyDiseases);
+            $return["application"]->diabetes = booleanize($return["application"]->diabetes);
+            $return["application"]->liverDiseases = booleanize($return["application"]->liverDiseases);
+            $return["application"]->rheumatism = booleanize($return["application"]->rheumatism);
+            $return["application"]->anemia = booleanize($return["application"]->anemia);
+            $return["application"]->cancer = booleanize($return["application"]->cancer);
+            $return["application"]->physicalDisability = booleanize($return["application"]->physicalDisability);
+            $return["application"]->gallbladderDiseases = booleanize($return["application"]->gallbladderDiseases);
+            // Booleanize general application vaccine fields
+            $return["application"]->tetanusVaccine = booleanize($return["application"]->tetanusVaccine);
+            $return["application"]->diphtheriaVaccine = booleanize($return["application"]->diphtheriaVaccine);
+            $return["application"]->pertussisVaccine = booleanize($return["application"]->pertussisVaccine);
+            $return["application"]->polioVaccine = booleanize($return["application"]->polioVaccine);
+            $return["application"]->measlesVaccine = booleanize($return["application"]->measlesVaccine);
+            $return["application"]->mumpsVaccine = booleanize($return["application"]->mumpsVaccine);
+            $return["application"]->rubellaVaccine = booleanize($return["application"]->rubellaVaccine);
             $return["application"]->doctorContactApproval = booleanize($return["application"]->doctorContactApproval);
             $return["application"]->otherDoctorContactApproval = booleanize($return["application"]->otherDoctorContactApproval);
             return new AjaxResponse($return);
@@ -204,9 +258,14 @@ class Applications {
                 'churchName',
                 'churchMember',
                 'churchMemberHowLong',
+                // Legacy Greek form fields (kept for backwards compatibility)
                 'ministryTalent',
                 'ministryExperience',
                 'testimony',
+                // General application fields
+                'personalStatement',
+                'pastorName',
+                'ministryInvolvement',
                 'statementOfFaithApproval'
             ];
             $joins = 'LEFT JOIN admin_applications_christian_life ON admin_applications_christian_life.userId = admin_user_applications.userId';
@@ -663,6 +722,7 @@ class Applications {
                     'motherName',
                     'phone',
                     'occupation',
+                    'sex',
                     'greekCitizen',
                     'greekIdNumber',
                     'greekSsn',
@@ -692,7 +752,7 @@ class Applications {
                     'guardianCountry',
                     'guardianOpinion'
                 ],
-                'values' => [$params->userId, $params->application->birthDate, $params->application->birthPlace, $params->application->fatherName, $params->application->motherName, $params->application->phone, $params->application->occupation, $params->application->greekCitizen, $params->application->greekIdNumber, $params->application->greekSsn, $params->application->irsOffice, $params->application->citizenship, $params->application->euCitizen, $params->application->passportNumber, $params->application->residencePermit, $params->application->familyStatus, $params->application->familySpouseFirstName, $params->application->familySpouseLastName, $params->application->familyKids, $params->application->familyKidsNamesAges, $params->application->address, $params->application->city, $params->application->zipCode, $params->application->country, $params->application->guardianFirstName, $params->application->guardianLastName, $params->application->guardianOccupation, $params->application->guardianEmail, $params->application->guardianPhone, $params->application->guardianAddressSame, $params->application->guardianAddress, $params->application->guardianCity, $params->application->guardianZipCode, $params->application->guardianCountry, $params->application->guardianOpinion],
+                'values' => [$params->userId, $params->application->birthDate, $params->application->birthPlace, $params->application->fatherName, $params->application->motherName, $params->application->phone, $params->application->occupation, $params->application->sex, $params->application->greekCitizen, $params->application->greekIdNumber, $params->application->greekSsn, $params->application->irsOffice, $params->application->citizenship, $params->application->euCitizen, $params->application->passportNumber, $params->application->residencePermit, $params->application->familyStatus, $params->application->familySpouseFirstName, $params->application->familySpouseLastName, $params->application->familyKids, $params->application->familyKidsNamesAges, $params->application->address, $params->application->city, $params->application->zipCode, $params->application->country, $params->application->guardianFirstName, $params->application->guardianLastName, $params->application->guardianOccupation, $params->application->guardianEmail, $params->application->guardianPhone, $params->application->guardianAddressSame, $params->application->guardianAddress, $params->application->guardianCity, $params->application->guardianZipCode, $params->application->guardianCountry, $params->application->guardianOpinion],
                 'update' => true
             ]);
         } elseif($params->applicationId === 2) { // Greek Education
@@ -735,6 +795,7 @@ class Applications {
                 'table' => 'admin_applications_health',
                 'columns' => [
                     'userId',
+                    // Legacy Greek form disease fields (backwards compatible)
                     'tonsillitis',
                     'chickenPox',
                     'bronchialAsthma',
@@ -750,6 +811,7 @@ class Applications {
                     'heartAbnormality',
                     'otherDiseases',
                     'otherDiseasesDetails',
+                    // Legacy Greek form vaccine fields (backwards compatible)
                     'vaccineDiphtheria',
                     'vaccinePertussis',
                     'vaccineTetanus',
@@ -761,6 +823,30 @@ class Applications {
                     'vaccineCholera',
                     'otherVaccines',
                     'otherVaccinesDetails',
+                    // General application disease fields
+                    'tuberculosis',
+                    'pneumonia',
+                    'asthma',
+                    'heartDiseases',
+                    'hypertension',
+                    'gastricUlcer',
+                    'kidneyDiseases',
+                    'diabetes',
+                    'liverDiseases',
+                    'rheumatism',
+                    'anemia',
+                    'cancer',
+                    'physicalDisability',
+                    'gallbladderDiseases',
+                    // General application vaccine fields
+                    'tetanusVaccine',
+                    'diphtheriaVaccine',
+                    'pertussisVaccine',
+                    'polioVaccine',
+                    'measlesVaccine',
+                    'mumpsVaccine',
+                    'rubellaVaccine',
+                    // Shared fields
                     'drugsUse',
                     'drugsUseDetails',
                     'learningDifficulties',
@@ -776,9 +862,11 @@ class Applications {
                     'firstEmergencyContactFirstName',
                     'firstEmergencyContactLastName',
                     'firstEmergencyContactPhone',
+                    'firstEmergencyContactRelationship',
                     'secondEmergencyContactFirstName',
                     'secondEmergencyContactLastName',
                     'secondEmergencyContactPhone',
+                    'secondEmergencyContactRelationship',
                     'doctor',
                     'doctorFirstName',
                     'doctorLastName',
@@ -790,7 +878,91 @@ class Applications {
                     'doctorContactApproval',
                     'otherDoctorContactApproval'
                 ],
-                'values' => [$params->userId, $params->application->tonsillitis, $params->application->chickenPox, $params->application->bronchialAsthma, $params->application->diphtheria, $params->application->epilepsy, $params->application->rubella, $params->application->measles, $params->application->yellowFever, $params->application->meningitis, $params->application->mumps, $params->application->polio, $params->application->cholera, $params->application->heartAbnormality, $params->application->otherDiseases, $params->application->otherDiseasesDetails, $params->application->vaccineDiphtheria, $params->application->vaccinePertussis, $params->application->vaccineTetanus, $params->application->vaccineSmallpox, $params->application->vaccineRubella, $params->application->vaccineMeasles, $params->application->vaccineMumps, $params->application->vaccinePolio, $params->application->vaccineCholera, $params->application->otherVaccines, $params->application->otherVaccinesDetails, $params->application->drugsUse, $params->application->drugsUseDetails, $params->application->learningDifficulties, $params->application->healthAccessibilityCircumstances, $params->application->currentDiseases, $params->application->currentDiseasesDetails, $params->application->currentSymptoms, $params->application->currentSymptomsDetails, $params->application->currentMedicines, $params->application->currentMedicinesDetails, $params->application->foodAllergy, $params->application->foodAllergyDetails, $params->application->firstEmergencyContactFirstName, $params->application->firstEmergencyContactLastName, $params->application->firstEmergencyContactPhone, $params->application->secondEmergencyContactFirstName, $params->application->secondEmergencyContactLastName, $params->application->secondEmergencyContactPhone, $params->application->doctor, $params->application->doctorFirstName, $params->application->doctorLastName, $params->application->doctorPhone, $params->application->doctorAddress, $params->application->doctorCity, $params->application->doctorZipCode, $params->application->doctorCountry, $params->application->doctorContactApproval, $params->application->otherDoctorContactApproval],
+                'values' => [
+                    $params->userId,
+                    // Legacy Greek form disease values
+                    $params->application->tonsillitis ?? null,
+                    $params->application->chickenPox ?? null,
+                    $params->application->bronchialAsthma ?? null,
+                    $params->application->diphtheria ?? null,
+                    $params->application->epilepsy ?? null,
+                    $params->application->rubella ?? null,
+                    $params->application->measles ?? null,
+                    $params->application->yellowFever ?? null,
+                    $params->application->meningitis ?? null,
+                    $params->application->mumps ?? null,
+                    $params->application->polio ?? null,
+                    $params->application->cholera ?? null,
+                    $params->application->heartAbnormality ?? null,
+                    $params->application->otherDiseases ?? null,
+                    $params->application->otherDiseasesDetails ?? null,
+                    // Legacy Greek form vaccine values
+                    $params->application->vaccineDiphtheria ?? null,
+                    $params->application->vaccinePertussis ?? null,
+                    $params->application->vaccineTetanus ?? null,
+                    $params->application->vaccineSmallpox ?? null,
+                    $params->application->vaccineRubella ?? null,
+                    $params->application->vaccineMeasles ?? null,
+                    $params->application->vaccineMumps ?? null,
+                    $params->application->vaccinePolio ?? null,
+                    $params->application->vaccineCholera ?? null,
+                    $params->application->otherVaccines ?? null,
+                    $params->application->otherVaccinesDetails ?? null,
+                    // General application disease values
+                    $params->application->tuberculosis ?? null,
+                    $params->application->pneumonia ?? null,
+                    $params->application->asthma ?? null,
+                    $params->application->heartDiseases ?? null,
+                    $params->application->hypertension ?? null,
+                    $params->application->gastricUlcer ?? null,
+                    $params->application->kidneyDiseases ?? null,
+                    $params->application->diabetes ?? null,
+                    $params->application->liverDiseases ?? null,
+                    $params->application->rheumatism ?? null,
+                    $params->application->anemia ?? null,
+                    $params->application->cancer ?? null,
+                    $params->application->physicalDisability ?? null,
+                    $params->application->gallbladderDiseases ?? null,
+                    // General application vaccine values
+                    $params->application->tetanusVaccine ?? null,
+                    $params->application->diphtheriaVaccine ?? null,
+                    $params->application->pertussisVaccine ?? null,
+                    $params->application->polioVaccine ?? null,
+                    $params->application->measlesVaccine ?? null,
+                    $params->application->mumpsVaccine ?? null,
+                    $params->application->rubellaVaccine ?? null,
+                    // Shared values
+                    $params->application->drugsUse ?? null,
+                    $params->application->drugsUseDetails ?? null,
+                    $params->application->learningDifficulties ?? null,
+                    $params->application->healthAccessibilityCircumstances ?? null,
+                    $params->application->currentDiseases ?? null,
+                    $params->application->currentDiseasesDetails ?? null,
+                    $params->application->currentSymptoms ?? null,
+                    $params->application->currentSymptomsDetails ?? null,
+                    $params->application->currentMedicines ?? null,
+                    $params->application->currentMedicinesDetails ?? null,
+                    $params->application->foodAllergy ?? null,
+                    $params->application->foodAllergyDetails ?? null,
+                    $params->application->firstEmergencyContactFirstName ?? null,
+                    $params->application->firstEmergencyContactLastName ?? null,
+                    $params->application->firstEmergencyContactPhone ?? null,
+                    $params->application->firstEmergencyContactRelationship ?? null,
+                    $params->application->secondEmergencyContactFirstName ?? null,
+                    $params->application->secondEmergencyContactLastName ?? null,
+                    $params->application->secondEmergencyContactPhone ?? null,
+                    $params->application->secondEmergencyContactRelationship ?? null,
+                    $params->application->doctor ?? null,
+                    $params->application->doctorFirstName ?? null,
+                    $params->application->doctorLastName ?? null,
+                    $params->application->doctorPhone ?? null,
+                    $params->application->doctorAddress ?? null,
+                    $params->application->doctorCity ?? null,
+                    $params->application->doctorZipCode ?? null,
+                    $params->application->doctorCountry ?? null,
+                    $params->application->doctorContactApproval ?? null,
+                    $params->application->otherDoctorContactApproval ?? null
+                ],
                 'update' => true
             ]);
         } elseif($params->applicationId === 4) { // Greek Christian Life
@@ -802,12 +974,31 @@ class Applications {
                     'churchName',
                     'churchMember',
                     'churchMemberHowLong',
+                    // Legacy Greek form fields (backwards compatible)
                     'ministryTalent',
                     'ministryExperience',
                     'testimony',
+                    // General application fields
+                    'personalStatement',
+                    'pastorName',
+                    'ministryInvolvement',
                     'statementOfFaithApproval'
                 ],
-                'values' => [$params->userId, $params->application->churchName, $params->application->churchMember, $params->application->churchMemberHowLong, $params->application->ministryTalent, $params->application->ministryExperience, $params->application->testimony, $params->application->statementOfFaithApproval],
+                'values' => [
+                    $params->userId,
+                    $params->application->churchName ?? null,
+                    $params->application->churchMember ?? null,
+                    $params->application->churchMemberHowLong ?? null,
+                    // Legacy Greek form values
+                    $params->application->ministryTalent ?? null,
+                    $params->application->ministryExperience ?? null,
+                    $params->application->testimony ?? null,
+                    // General application values
+                    $params->application->personalStatement ?? null,
+                    $params->application->pastorName ?? null,
+                    $params->application->ministryInvolvement ?? null,
+                    $params->application->statementOfFaithApproval ?? null
+                ],
                 'update' => true
             ]);
         } elseif($params->applicationId === 5) { // Greek References

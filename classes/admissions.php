@@ -753,9 +753,11 @@ class Admissions {
             $this->clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactFirstName = $serverModel->firstEmergencyContactFirstName;
             $this->clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactLastName = $serverModel->firstEmergencyContactLastName;
             $this->clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactPhone = $serverModel->firstEmergencyContactPhone;
+            $this->clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactRelationship = $serverModel->firstEmergencyContactRelationship;
             $this->clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactFirstName = $serverModel->secondEmergencyContactFirstName;
             $this->clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactLastName = $serverModel->secondEmergencyContactLastName;
             $this->clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactPhone = $serverModel->secondEmergencyContactPhone;
+            $this->clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactRelationship = $serverModel->secondEmergencyContactRelationship;
             $this->clientModel->healthFormModel->emergencyContactsModel->doctor = booleanize($serverModel->doctor);
             $this->clientModel->healthFormModel->emergencyContactsModel->doctorFirstName = $serverModel->doctorFirstName;
             $this->clientModel->healthFormModel->emergencyContactsModel->doctorLastName = $serverModel->doctorLastName;
@@ -810,9 +812,11 @@ class Admissions {
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactFirstName)? $clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactFirstName: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactLastName)? $clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactLastName: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactPhone)? $clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactPhone: null;
+            $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactRelationship)? $clientModel->healthFormModel->emergencyContactsModel->firstEmergencyContactRelationship: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactFirstName)? $clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactFirstName: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactLastName)? $clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactLastName: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactPhone)? $clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactPhone: null;
+            $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactRelationship)? $clientModel->healthFormModel->emergencyContactsModel->secondEmergencyContactRelationship: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->doctor)? $clientModel->healthFormModel->emergencyContactsModel->doctor: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->doctorFirstName)? $clientModel->healthFormModel->emergencyContactsModel->doctorFirstName: null;
             $this->serverModel[] = isset($clientModel->healthFormModel->emergencyContactsModel->doctorLastName)? $clientModel->healthFormModel->emergencyContactsModel->doctorLastName: null;
