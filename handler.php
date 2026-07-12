@@ -252,9 +252,9 @@ function dbg($p, $die = true){
 }
 
 function booleanize($mySQLTinyIntValue){
-    if($mySQLTinyIntValue === "1"){
+    if($mySQLTinyIntValue === "1" || $mySQLTinyIntValue === 1 || $mySQLTinyIntValue === true){
         return true;
-    } elseif($mySQLTinyIntValue === "0"){
+    } elseif($mySQLTinyIntValue === "0" || $mySQLTinyIntValue === 0 || $mySQLTinyIntValue === false){
         return false;
     } else {
         return $mySQLTinyIntValue;

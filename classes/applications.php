@@ -199,55 +199,57 @@ class Applications {
                 'joins' => $joins,
                 'where' => ['admin_user_applications.userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
             ]);
-            // Booleanize legacy Greek form disease fields
-            $return["application"]->tonsillitis = booleanize($return["application"]->tonsillitis);
-            $return["application"]->chickenPox = booleanize($return["application"]->chickenPox);
-            $return["application"]->bronchialAsthma = booleanize($return["application"]->bronchialAsthma);
-            $return["application"]->diphtheria = booleanize($return["application"]->diphtheria);
-            $return["application"]->epilepsy = booleanize($return["application"]->epilepsy);
-            $return["application"]->rubella = booleanize($return["application"]->rubella);
-            $return["application"]->measles = booleanize($return["application"]->measles);
-            $return["application"]->yellowFever = booleanize($return["application"]->yellowFever);
-            $return["application"]->meningitis = booleanize($return["application"]->meningitis);
-            $return["application"]->mumps = booleanize($return["application"]->mumps);
-            $return["application"]->polio = booleanize($return["application"]->polio);
-            $return["application"]->cholera = booleanize($return["application"]->cholera);
-            $return["application"]->heartAbnormality = booleanize($return["application"]->heartAbnormality);
-            // Booleanize legacy Greek form vaccine fields
-            $return["application"]->vaccineDiphtheria = booleanize($return["application"]->vaccineDiphtheria);
-            $return["application"]->vaccinePertussis = booleanize($return["application"]->vaccinePertussis);
-            $return["application"]->vaccineTetanus = booleanize($return["application"]->vaccineTetanus);
-            $return["application"]->vaccineSmallpox = booleanize($return["application"]->vaccineSmallpox);
-            $return["application"]->vaccineRubella = booleanize($return["application"]->vaccineRubella);
-            $return["application"]->vaccineMeasles = booleanize($return["application"]->vaccineMeasles);
-            $return["application"]->vaccineMumps = booleanize($return["application"]->vaccineMumps);
-            $return["application"]->vaccinePolio = booleanize($return["application"]->vaccinePolio);
-            $return["application"]->vaccineCholera = booleanize($return["application"]->vaccineCholera);
-            // Booleanize general application disease fields
-            $return["application"]->tuberculosis = booleanize($return["application"]->tuberculosis);
-            $return["application"]->pneumonia = booleanize($return["application"]->pneumonia);
-            $return["application"]->asthma = booleanize($return["application"]->asthma);
-            $return["application"]->heartDiseases = booleanize($return["application"]->heartDiseases);
-            $return["application"]->hypertension = booleanize($return["application"]->hypertension);
-            $return["application"]->gastricUlcer = booleanize($return["application"]->gastricUlcer);
-            $return["application"]->kidneyDiseases = booleanize($return["application"]->kidneyDiseases);
-            $return["application"]->diabetes = booleanize($return["application"]->diabetes);
-            $return["application"]->liverDiseases = booleanize($return["application"]->liverDiseases);
-            $return["application"]->rheumatism = booleanize($return["application"]->rheumatism);
-            $return["application"]->anemia = booleanize($return["application"]->anemia);
-            $return["application"]->cancer = booleanize($return["application"]->cancer);
-            $return["application"]->physicalDisability = booleanize($return["application"]->physicalDisability);
-            $return["application"]->gallbladderDiseases = booleanize($return["application"]->gallbladderDiseases);
-            // Booleanize general application vaccine fields
-            $return["application"]->tetanusVaccine = booleanize($return["application"]->tetanusVaccine);
-            $return["application"]->diphtheriaVaccine = booleanize($return["application"]->diphtheriaVaccine);
-            $return["application"]->pertussisVaccine = booleanize($return["application"]->pertussisVaccine);
-            $return["application"]->polioVaccine = booleanize($return["application"]->polioVaccine);
-            $return["application"]->measlesVaccine = booleanize($return["application"]->measlesVaccine);
-            $return["application"]->mumpsVaccine = booleanize($return["application"]->mumpsVaccine);
-            $return["application"]->rubellaVaccine = booleanize($return["application"]->rubellaVaccine);
-            $return["application"]->doctorContactApproval = booleanize($return["application"]->doctorContactApproval);
-            $return["application"]->otherDoctorContactApproval = booleanize($return["application"]->otherDoctorContactApproval);
+            if ($return["application"]) {
+                // Booleanize legacy Greek form disease fields
+                $return["application"]->tonsillitis = booleanize($return["application"]->tonsillitis);
+                $return["application"]->chickenPox = booleanize($return["application"]->chickenPox);
+                $return["application"]->bronchialAsthma = booleanize($return["application"]->bronchialAsthma);
+                $return["application"]->diphtheria = booleanize($return["application"]->diphtheria);
+                $return["application"]->epilepsy = booleanize($return["application"]->epilepsy);
+                $return["application"]->rubella = booleanize($return["application"]->rubella);
+                $return["application"]->measles = booleanize($return["application"]->measles);
+                $return["application"]->yellowFever = booleanize($return["application"]->yellowFever);
+                $return["application"]->meningitis = booleanize($return["application"]->meningitis);
+                $return["application"]->mumps = booleanize($return["application"]->mumps);
+                $return["application"]->polio = booleanize($return["application"]->polio);
+                $return["application"]->cholera = booleanize($return["application"]->cholera);
+                $return["application"]->heartAbnormality = booleanize($return["application"]->heartAbnormality);
+                // Booleanize legacy Greek form vaccine fields
+                $return["application"]->vaccineDiphtheria = booleanize($return["application"]->vaccineDiphtheria);
+                $return["application"]->vaccinePertussis = booleanize($return["application"]->vaccinePertussis);
+                $return["application"]->vaccineTetanus = booleanize($return["application"]->vaccineTetanus);
+                $return["application"]->vaccineSmallpox = booleanize($return["application"]->vaccineSmallpox);
+                $return["application"]->vaccineRubella = booleanize($return["application"]->vaccineRubella);
+                $return["application"]->vaccineMeasles = booleanize($return["application"]->vaccineMeasles);
+                $return["application"]->vaccineMumps = booleanize($return["application"]->vaccineMumps);
+                $return["application"]->vaccinePolio = booleanize($return["application"]->vaccinePolio);
+                $return["application"]->vaccineCholera = booleanize($return["application"]->vaccineCholera);
+                // Booleanize general disease fields
+                $return["application"]->tuberculosis = booleanize($return["application"]->tuberculosis);
+                $return["application"]->pneumonia = booleanize($return["application"]->pneumonia);
+                $return["application"]->asthma = booleanize($return["application"]->asthma);
+                $return["application"]->heartDiseases = booleanize($return["application"]->heartDiseases);
+                $return["application"]->hypertension = booleanize($return["application"]->hypertension);
+                $return["application"]->gastricUlcer = booleanize($return["application"]->gastricUlcer);
+                $return["application"]->kidneyDiseases = booleanize($return["application"]->kidneyDiseases);
+                $return["application"]->diabetes = booleanize($return["application"]->diabetes);
+                $return["application"]->liverDiseases = booleanize($return["application"]->liverDiseases);
+                $return["application"]->rheumatism = booleanize($return["application"]->rheumatism);
+                $return["application"]->anemia = booleanize($return["application"]->anemia);
+                $return["application"]->cancer = booleanize($return["application"]->cancer);
+                $return["application"]->physicalDisability = booleanize($return["application"]->physicalDisability);
+                $return["application"]->gallbladderDiseases = booleanize($return["application"]->gallbladderDiseases);
+                // Booleanize general vaccine fields
+                $return["application"]->tetanusVaccine = booleanize($return["application"]->tetanusVaccine);
+                $return["application"]->diphtheriaVaccine = booleanize($return["application"]->diphtheriaVaccine);
+                $return["application"]->pertussisVaccine = booleanize($return["application"]->pertussisVaccine);
+                $return["application"]->polioVaccine = booleanize($return["application"]->polioVaccine);
+                $return["application"]->measlesVaccine = booleanize($return["application"]->measlesVaccine);
+                $return["application"]->mumpsVaccine = booleanize($return["application"]->mumpsVaccine);
+                $return["application"]->rubellaVaccine = booleanize($return["application"]->rubellaVaccine);
+                $return["application"]->doctorContactApproval = booleanize($return["application"]->doctorContactApproval);
+                $return["application"]->otherDoctorContactApproval = booleanize($return["application"]->otherDoctorContactApproval);
+            }
             return new AjaxResponse($return);
         } elseif($params->applicationId === 4) { // Greek Christian Life
             if(!$this->auth->authenticateOperation('getUserApplicationFormModelForOthers')) {
@@ -911,28 +913,28 @@ class Applications {
                     $params->application->otherVaccines ?? null,
                     $params->application->otherVaccinesDetails ?? null,
                     // General application disease values
-                    $params->application->tuberculosis ?? null,
-                    $params->application->pneumonia ?? null,
-                    $params->application->asthma ?? null,
-                    $params->application->heartDiseases ?? null,
-                    $params->application->hypertension ?? null,
-                    $params->application->gastricUlcer ?? null,
-                    $params->application->kidneyDiseases ?? null,
-                    $params->application->diabetes ?? null,
-                    $params->application->liverDiseases ?? null,
-                    $params->application->rheumatism ?? null,
-                    $params->application->anemia ?? null,
-                    $params->application->cancer ?? null,
-                    $params->application->physicalDisability ?? null,
-                    $params->application->gallbladderDiseases ?? null,
+                    !empty($params->application->tuberculosis) ? 1 : 0,
+                    !empty($params->application->pneumonia) ? 1 : 0,
+                    !empty($params->application->asthma) ? 1 : 0,
+                    !empty($params->application->heartDiseases) ? 1 : 0,
+                    !empty($params->application->hypertension) ? 1 : 0,
+                    !empty($params->application->gastricUlcer) ? 1 : 0,
+                    !empty($params->application->kidneyDiseases) ? 1 : 0,
+                    !empty($params->application->diabetes) ? 1 : 0,
+                    !empty($params->application->liverDiseases) ? 1 : 0,
+                    !empty($params->application->rheumatism) ? 1 : 0,
+                    !empty($params->application->anemia) ? 1 : 0,
+                    !empty($params->application->cancer) ? 1 : 0,
+                    !empty($params->application->physicalDisability) ? 1 : 0,
+                    !empty($params->application->gallbladderDiseases) ? 1 : 0,
                     // General application vaccine values
-                    $params->application->tetanusVaccine ?? null,
-                    $params->application->diphtheriaVaccine ?? null,
-                    $params->application->pertussisVaccine ?? null,
-                    $params->application->polioVaccine ?? null,
-                    $params->application->measlesVaccine ?? null,
-                    $params->application->mumpsVaccine ?? null,
-                    $params->application->rubellaVaccine ?? null,
+                    !empty($params->application->tetanusVaccine) ? 1 : 0,
+                    !empty($params->application->diphtheriaVaccine) ? 1 : 0,
+                    !empty($params->application->pertussisVaccine) ? 1 : 0,
+                    !empty($params->application->polioVaccine) ? 1 : 0,
+                    !empty($params->application->measlesVaccine) ? 1 : 0,
+                    !empty($params->application->mumpsVaccine) ? 1 : 0,
+                    !empty($params->application->rubellaVaccine) ? 1 : 0,
                     // Shared values
                     $params->application->drugsUse ?? null,
                     $params->application->drugsUseDetails ?? null,
@@ -1084,7 +1086,18 @@ class Applications {
                     'programInterested',
                     'programInterestedDetails'
                 ],
-                'values' => [$params->userId, $params->application->studentPackage, $params->application->financialApproval, $params->application->selfPaid, $params->application->sponsors, $params->application->sponsorsTotal, $params->application->debtApproval, $params->application->deposit, isset($params->application->programInterested)? $params->application->programInterested: null, isset($params->application->programInterestedDetails)? $params->application->programInterestedDetails: null],
+                'values' => [
+                    $params->userId,
+                    $params->application->studentPackage,
+                    isset($params->application->financialApproval) ? ($params->application->financialApproval === null ? null : ($params->application->financialApproval ? 1 : 0)) : null,
+                    isset($params->application->selfPaid) ? ($params->application->selfPaid === null ? null : ($params->application->selfPaid ? 1 : 0)) : null,
+                    $params->application->sponsors,
+                    $params->application->sponsorsTotal,
+                    isset($params->application->debtApproval) ? ($params->application->debtApproval === null ? null : ($params->application->debtApproval ? 1 : 0)) : null,
+                    $params->application->deposit,
+                    isset($params->application->programInterested) ? $params->application->programInterested : null,
+                    isset($params->application->programInterestedDetails) ? $params->application->programInterestedDetails : null
+                ],
                 'update' => true
             ]);
         } elseif($params->applicationId === 7) { // ISP Personal
@@ -1341,6 +1354,9 @@ class Applications {
     function setUserApplicationDocumentType($params) {
         try {
             $userId = isset($params->userId) ? $params->userId : $this->user->id;
+            if (!isset($params->documentId) || !is_string($params->documentId)) {
+                return new AjaxError('Invalid document ID format.');
+            }
             $sql = 'INSERT INTO admin_applications_documents (userId, documentId, documentTypeId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE userId = ?, documentTypeId = ?;';
             $insertStatement = $this->db->prepare($sql);
             $result = $insertStatement->execute([$userId, $params->documentId, $params->documentTypeId, $userId, $params->documentTypeId]);
@@ -1414,6 +1430,9 @@ class Applications {
         } elseif($params->applicationId === 12) { // Supporting Documentation
             array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'Supporting Documents']);
             array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Δικαιολογητικά']);
+        } elseif($params->applicationId === 23) { // General Application
+            array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'General Application']);
+            array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Γενική Αίτηση']);
         }
 
         if($isApplicant){ // User is an Applicant

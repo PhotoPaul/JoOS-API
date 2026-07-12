@@ -30,6 +30,10 @@ class FileSystem {
                 $filesize = @filesize('files/'.$filename);
             }
 
+            if ($filesize === false) {
+                throw new Exception("Failed to retrieve file size for files/".$filename);
+            }
+
             // Replaced by the above due to no overwrite
             // // Determine File size and make sure File is properly saved
             // $filesize = @filesize('files/'.$filename);
@@ -70,14 +74,24 @@ class FileSystem {
         require_once('./classes/uploadhandler.php');
         $upload_handler = new UploadHandler();
 
+        $file = isset($upload_handler->response["file"][0]) ? $upload_handler->response["file"][0] : null;
+        if (!$file || isset($file->error)) {
+            ob_end_clean();
+            return new AjaxError("Upload failed: " . ($file ? $file->error : "No file uploaded"));
+        }
+
         $filename = $this->saveFile((object) [
             "userId" => $userId,
             "originalFileName" => $originalFileName,
             "originalMimeType" => $originalMimeType,
-            "filename" => $upload_handler->response["file"][0]->name
+            "filename" => $file->name
         ]);
 
         ob_end_clean();
+
+        if ($filename instanceof AjaxError) {
+            return $filename;
+        }
 
         return new AjaxResponse($filename);
     }
