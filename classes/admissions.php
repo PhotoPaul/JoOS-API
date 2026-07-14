@@ -217,6 +217,9 @@ class Admissions {
         $pdfService = new PDFService();
 
         foreach($applicationsData as $applicationData) {
+            if($applicationData->applicationId === "5" || $applicationData->applicationId === "11") {
+                continue;
+            }
             if($applicationData->applicationId === "1") {
                 $sql = 'SELECT firstName, lastName, email FROM admin_users WHERE id = ?;';
                 $statement = $this->db->prepare($sql);
@@ -283,6 +286,17 @@ class Admissions {
                 $pdfService->AddPage();
                 $pdfService->PrintReportStatus($applicationData->applicationStatus);
                 $pdfService->printOnISPReferencesTemplate($applicationData);
+            }
+            elseif($applicationData->applicationId === "23") {
+                $sql = 'SELECT firstName, lastName, email FROM admin_users WHERE id = ?;';
+                $statement = $this->db->prepare($sql);
+                $statement->execute([$params->id]);
+                $result = $statement->fetch(PDO::FETCH_OBJ);
+                $applicationData->data->firstName = $result->firstName;
+                $applicationData->data->lastName = $result->lastName;
+                $applicationData->data->email = $result->email;
+                $pdfService->PrintReportStatus($applicationData->applicationStatus);
+                $pdfService->printOnGeneralApplicationTemplate($applicationData);
             }
             elseif($applicationData->applicationId === "12") {
                 // No need to print
