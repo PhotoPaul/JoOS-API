@@ -646,8 +646,10 @@ class GrBC {
         }
 
         // If you need to skip ReCaptcha check then uncomment the following line
-        // $result = (object) ["success"=>true];
-        // Make sure the line above is commented out in production
+        global $prod;
+        if (!$prod) {
+            $result = (object) ["success"=>true];
+        }
 
         if($result->success){
             $params->authenticationToken = $this->hasher->HashPassword(json_encode($params));

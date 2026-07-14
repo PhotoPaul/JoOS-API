@@ -678,14 +678,78 @@ class Applications {
             }
             $columns = [
                 'applicationStatus',
-                'whyApply',
+                'firstName',
+                'lastName',
+                'email',
+                'sex',
+                'birthDate',
+                'birthPlace',
+                'fatherName',
+                'motherName',
+                'phone',
+                'occupation',
+                'greekCitizen',
+                'greekIdNumber',
+                'greekSsn',
+                'irsOffice',
+                'citizenship',
+                'euCitizen',
+                'passportNumber',
+                'residencePermit',
+                'familyStatus',
+                'address',
+                'city',
+                'zipCode',
+                'country',
+                'guardianFirstName',
+                'guardianLastName',
+                'guardianOccupation',
+                'guardianEmail',
+                'guardianPhone',
+                'guardianAddressSame',
+                'guardianAddress',
+                'guardianCity',
+                'guardianZipCode',
+                'guardianCountry',
+                'guardianOpinion',
+                'secondarySchoolGraduate',
+                'secondarySchoolName',
+                'secondarySchoolGraduationYear',
+                'secondarySchoolDiscipline',
+                'communityCollegeName',
+                'communityCollegeGraduationYear',
+                'communityCollegeDiscipline',
+                'collegeName',
+                'collegeGraduationYear',
+                'collegeDiscipline',
+                'graduateSchoolName',
+                'graduateSchoolGraduationYear',
+                'graduateSchoolDiscipline',
+                'greek',
+                'english',
+                'computerFluency',
+                'computerAccess',
+                'internetAccess',
+                'wordProcessingFluency',
+                'learningDifficulties',
+                'healthAccessibilityCircumstances',
+                'firstEmergencyContactFirstName',
+                'firstEmergencyContactLastName',
+                'firstEmergencyContactPhone',
+                'firstEmergencyContactRelationship',
                 'churchName',
                 'pastorName',
                 'ministryInvolvement',
                 'personalStatement',
-                'statementOfFaithApproval'
+                'statementOfFaithApproval',
+                'financialApproval',
+                'deposit',
+                'programInterestedDetails'
             ];
-            $joins = 'LEFT JOIN admin_applications_general ON admin_applications_general.userId = admin_user_applications.userId';
+            $joins = [
+                'JOIN admin_users ON userId = admin_users.id',
+                'LEFT JOIN admin_applications_general ON admin_applications_general.userId = admin_user_applications.userId'
+            ];
             $return["application"] = $this->db2->sql1([
                 'statement' => 'SELECT',
                 'columns' => $columns,
@@ -693,8 +757,26 @@ class Applications {
                 'joins' => $joins,
                 'where' => ['admin_user_applications.userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
             ]);
-            if (isset($return["application"])) {
-                $return["application"]->statementOfFaithApproval = isset($return["application"]->statementOfFaithApproval) ? booleanize($return["application"]->statementOfFaithApproval) : null;
+            if (isset($return["application"]) && $return["application"]) {
+                $booleanFields = [
+                    'statementOfFaithApproval',
+                    'financialApproval'
+                ];
+                foreach ($booleanFields as $field) {
+                    $return["application"]->$field = isset($return["application"]->$field) ? booleanize($return["application"]->$field) : null;
+                }
+
+                $stringRadioFields = [
+                    'greekCitizen', 'euCitizen', 'residencePermit',
+                    'guardianAddressSame',
+                    'secondarySchoolGraduate', 'computerFluency', 'computerAccess', 'internetAccess', 'wordProcessingFluency',
+                    'greek', 'english'
+                ];
+                foreach ($stringRadioFields as $field) {
+                    if (isset($return["application"]->$field) && $return["application"]->$field !== null) {
+                        $return["application"]->$field = (string)$return["application"]->$field;
+                    }
+                }
             }
             return new AjaxResponse($return);
         }
@@ -1329,19 +1411,55 @@ class Applications {
                 'update' => true
             ]);
         } elseif($params->applicationId === 23) { // General Application
+            $columns = ['userId'];
+            $values = [$params->userId];
+
+            // List of text/varchar/date/int fields to save as-is or null
+            $normalFields = [
+                'sex', 'birthDate', 'birthPlace', 'fatherName', 'motherName', 'phone', 'occupation', 'greekIdNumber', 'greekSsn', 'irsOffice', 'citizenship', 'passportNumber', 'address', 'city', 'zipCode', 'country',
+                'familyStatus',
+                'guardianFirstName', 'guardianLastName', 'guardianOccupation', 'guardianEmail', 'guardianPhone', 'guardianAddress', 'guardianCity', 'guardianZipCode', 'guardianCountry', 'guardianOpinion',
+                'secondarySchoolName', 'secondarySchoolGraduationYear', 'secondarySchoolDiscipline',
+                'communityCollegeName', 'communityCollegeGraduationYear', 'communityCollegeDiscipline',
+                'collegeName', 'collegeGraduationYear', 'collegeDiscipline',
+                'graduateSchoolName', 'graduateSchoolGraduationYear', 'graduateSchoolDiscipline',
+                'greek', 'english',
+                'learningDifficulties', 'healthAccessibilityCircumstances',
+                'firstEmergencyContactFirstName', 'firstEmergencyContactLastName', 'firstEmergencyContactPhone', 'firstEmergencyContactRelationship',
+                'churchName', 'pastorName', 'ministryInvolvement', 'personalStatement',
+                'deposit', 'programInterestedDetails',
+                'guardianAddressSame',
+                'greekCitizen', 'euCitizen', 'residencePermit',
+                'secondarySchoolGraduate', 'computerFluency', 'computerAccess', 'internetAccess', 'wordProcessingFluency'
+            ];
+
+            // List of tinyint(1) fields that need to be mapped to 1/0/null safely
+            $booleanFields = [
+                'statementOfFaithApproval',
+                'financialApproval'
+            ];
+
+            foreach ($normalFields as $field) {
+                if (property_exists($params->application, $field)) {
+                    $columns[] = $field;
+                    $val = $params->application->$field;
+                    $values[] = ($val === '' ? null : $val);
+                }
+            }
+
+            foreach ($booleanFields as $field) {
+                if (property_exists($params->application, $field)) {
+                    $columns[] = $field;
+                    $val = $params->application->$field;
+                    $values[] = ($val === null || $val === '' ? null : ($val ? 1 : 0));
+                }
+            }
+
             $result = $this->db2->sql([
                 'statement' => 'INSERT INTO',
                 'table' => 'admin_applications_general',
-                'columns' => [
-                    'userId',
-                    'whyApply',
-                    'churchName',
-                    'pastorName',
-                    'ministryInvolvement',
-                    'personalStatement',
-                    'statementOfFaithApproval'
-                ],
-                'values' => [$params->userId, $params->application->whyApply, $params->application->churchName, $params->application->pastorName, $params->application->ministryInvolvement, $params->application->personalStatement, $params->application->statementOfFaithApproval],
+                'columns' => $columns,
+                'values' => $values,
                 'update' => true
             ]);
         } else {
@@ -1450,7 +1568,15 @@ class Applications {
             array_push($notificationOptions["vars"], ['lastName', $this->user->lastName]);
 
             // Send Notification to the Registrar of the specific program
-            (new NotificationService())->send($notificationOptions);
+            $hasGeneralApp = $this->db2->sql1([
+                'statement' => 'SELECT',
+                'columns' => 'userId',
+                'table' => 'admin_user_applications',
+                'where' => ['userId = ? AND applicationId = 23', $params->userId]
+            ]);
+            if (!($hasGeneralApp && ($params->applicationId === 5 || $params->applicationId === 11))) {
+                (new NotificationService())->send($notificationOptions);
+            }
 
             // If it's a Greek Financial Liability Application send Notification to the Cashier as well
             if ($params->applicationId === 6 || $params->applicationId === 21) {

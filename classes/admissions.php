@@ -402,6 +402,40 @@ class Admissions {
                 'table' => 'admin_applications_'.$application->dbTable,
                 'where' => ['userId = ?', $params->userId]
             ]);
+
+            // If it is the general application, also clear references and documents
+            if ($application->dbTable === 'general') {
+                $this->db2->sql([
+                    'statement' => 'DELETE FROM',
+                    'table' => 'admin_applications_references',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+                $this->db2->sql([
+                    'statement' => 'DELETE FROM',
+                    'table' => 'admin_applications_isp_references',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+
+                // Retrieve all document IDs to delete from the filesystem
+                $documents = $this->db2->sql([
+                    'statement' => 'SELECT',
+                    'columns' => 'documentId',
+                    'table' => 'admin_applications_documents',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+                $fs = new FileSystem();
+                foreach ($documents as $doc) {
+                    if (!empty($doc->documentId)) {
+                        $fs->deleteFile((object)['filename' => $doc->documentId]);
+                    }
+                }
+
+                $this->db2->sql([
+                    'statement' => 'DELETE FROM',
+                    'table' => 'admin_applications_documents',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+            }
         }
 
         // Remove all Applications from Applicant
