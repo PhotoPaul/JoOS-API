@@ -349,6 +349,44 @@ class Admissions {
             $referenceId = $params->decision ? preg_replace('/[^A-Za-z0-9_\-]/', '_', $this->hasher->HashPassword($params->userId)) : '';
             $result = $updateStatement->execute([$referenceId, $params->userId, $params->priority]);
         }
+
+        // Comprehensive state calculation for general application recommendation letters
+        if ($params->priority == 0 || $params->priority == 1) {
+            $sql = 'SELECT priority, referenceId FROM admin_applications_references WHERE userId = ? AND priority IN (0, 1);';
+            $selectStatement = $this->db->prepare($sql);
+            $selectStatement->execute([$params->userId]);
+            $references = $selectStatement->fetchAll(PDO::FETCH_OBJ);
+            
+            $hasRejected = false;
+            $allApproved = true;
+            $count = 0;
+            foreach ($references as $ref) {
+                $count++;
+                $refId = ($ref->priority == $params->priority) ? $referenceId : $ref->referenceId;
+                if ($refId === '0') {
+                    $hasRejected = true;
+                }
+                if (!$refId || $refId === '0' || strlen($refId) < 34) {
+                    $allApproved = false;
+                }
+            }
+            if ($count < 2) {
+                $allApproved = false;
+            }
+
+            if ($hasRejected) {
+                $newStatus = 3; // notRecorded (Rejected)
+            } else if ($allApproved) {
+                $newStatus = 1; // recorded (Approved)
+            } else {
+                $newStatus = 2; // pendingDecision
+            }
+
+            $sql = 'UPDATE admin_user_applications SET applicationStatus = ? WHERE userId = ? AND applicationId IN (5, 11);';
+            $updateStatusStatement = $this->db->prepare($sql);
+            $updateStatusStatement->execute([$newStatus, $params->userId]);
+        }
+
         return new AjaxResponse([
             "referenceId" => $referenceId
         ]);
