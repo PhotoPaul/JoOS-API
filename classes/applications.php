@@ -779,6 +779,127 @@ class Applications {
                 }
             }
             return new AjaxResponse($return);
+        } elseif($params->applicationId === 24) { // General Registration
+            if(!(
+                $this->auth->authenticateOperation('getUserApplicationFormModelForOthers') ||
+                $this->auth->authenticateOperation('getUserApplicationFormModelForOthersFinancial')
+            )) {
+                $params->userId = $this->user->id;
+            }
+            $columns = [
+                'applicationStatus',
+                'studyMode',
+                'greekTrack',
+                'greekDuration',
+                'greekLoad',
+                'greekResidence',
+                'ispTrack',
+                'coursesFirstSemester',
+                'coursesSecondSemester',
+                'coursesAuditor',
+                'hasContagiousDisease',
+                'contagiousDiseaseDetails',
+                'medicalTreatmentDetails',
+                'foodAllergies',
+                'acceptStudentManual',
+                'acceptOnlineManual',
+                'acceptPrivacyPolicy',
+                'financialLiabilityApproval'
+            ];
+            $joins = [
+                'JOIN admin_users ON userId = admin_users.id',
+                'LEFT JOIN admin_applications_registration ON admin_applications_registration.userId = admin_user_applications.userId'
+            ];
+            $return["application"] = $this->db2->sql1([
+                'statement' => 'SELECT',
+                'columns' => $columns,
+                'table' => 'admin_user_applications',
+                'joins' => $joins,
+                'where' => ['admin_user_applications.userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
+            ]);
+            if (isset($return["application"]) && $return["application"]) {
+                $booleanFields = [
+                    'acceptStudentManual',
+                    'acceptOnlineManual',
+                    'acceptPrivacyPolicy',
+                    'financialLiabilityApproval'
+                ];
+                foreach ($booleanFields as $field) {
+                    $return["application"]->$field = isset($return["application"]->$field) ? booleanize($return["application"]->$field) : null;
+                }
+
+                $stringRadioFields = [
+                    'hasContagiousDisease'
+                ];
+                foreach ($stringRadioFields as $field) {
+                    if (isset($return["application"]->$field) && $return["application"]->$field !== null) {
+                        $return["application"]->$field = (string)$return["application"]->$field;
+                    }
+                }
+            }
+            return new AjaxResponse($return);
+        } elseif($params->applicationId === 25) { // 3 Year Program Application
+            if(!(
+                $this->auth->authenticateOperation('getUserApplicationFormModelForOthers') ||
+                $this->auth->authenticateOperation('getUserApplicationFormModelForOthersFinancial')
+            )) {
+                $params->userId = $this->user->id;
+            }
+            $columns = [
+                'applicationStatus',
+                'firstName',
+                'lastName',
+                'email',
+                'phone',
+                'birthDate',
+                'birthPlace',
+                'address',
+                'city',
+                'zipCode',
+                'maritalStatus',
+                'maritalStatusDetails',
+                'studentType',
+                'fundingSource',
+                'sponsorName',
+                'sponsorPhone',
+                'sponsorAmount',
+                'studentAmount',
+                'churchMissionDetails',
+                'reasonToContinue',
+                'pastorDiscussion',
+                'ministryCalling',
+                'currentService',
+                'schoolRegulationsAgreement',
+                'submissionDate',
+                'studentSignature',
+                'academicDirectorApproval',
+                'generalDirectorApproval',
+                'admissionStatus',
+                'facultyDecisionDate'
+            ];
+            $joins = [
+                'JOIN admin_users ON userId = admin_users.id',
+                'LEFT JOIN admin_applications_general ON admin_applications_general.userId = admin_user_applications.userId',
+                'LEFT JOIN admin_applications_three_year ON admin_applications_three_year.userId = admin_user_applications.userId'
+            ];
+            $return["application"] = $this->db2->sql1([
+                'statement' => 'SELECT',
+                'columns' => $columns,
+                'table' => 'admin_user_applications',
+                'joins' => $joins,
+                'where' => ['admin_user_applications.userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
+            ]);
+            if (isset($return["application"]) && $return["application"]) {
+                $booleanFields = [
+                    'schoolRegulationsAgreement',
+                    'academicDirectorApproval',
+                    'generalDirectorApproval'
+                ];
+                foreach ($booleanFields as $field) {
+                    $return["application"]->$field = isset($return["application"]->$field) ? booleanize($return["application"]->$field) : null;
+                }
+            }
+            return new AjaxResponse($return);
         }
 
         $return["application"] = $this->db2->sql1([
@@ -1462,6 +1583,87 @@ class Applications {
                 'values' => $values,
                 'update' => true
             ]);
+        } elseif($params->applicationId === 24) { // General Registration
+            $columns = ['userId'];
+            $values = [$params->userId];
+
+            $normalFields = [
+                'studyMode', 'greekTrack', 'greekDuration', 'greekLoad', 'greekResidence', 'ispTrack',
+                'coursesFirstSemester', 'coursesSecondSemester', 'coursesAuditor',
+                'contagiousDiseaseDetails', 'medicalTreatmentDetails', 'foodAllergies',
+                'hasContagiousDisease'
+            ];
+
+            $booleanFields = [
+                'acceptStudentManual',
+                'acceptOnlineManual',
+                'acceptPrivacyPolicy',
+                'financialLiabilityApproval'
+            ];
+
+            foreach ($normalFields as $field) {
+                if (property_exists($params->application, $field)) {
+                    $columns[] = $field;
+                    $val = $params->application->$field;
+                    $values[] = ($val === '' ? null : $val);
+                }
+            }
+
+            foreach ($booleanFields as $field) {
+                if (property_exists($params->application, $field)) {
+                    $columns[] = $field;
+                    $val = $params->application->$field;
+                    $values[] = ($val === null || $val === '' ? null : ($val ? 1 : 0));
+                }
+            }
+
+            $result = $this->db2->sql([
+                'statement' => 'INSERT INTO',
+                'table' => 'admin_applications_registration',
+                'columns' => $columns,
+                'values' => $values,
+                'update' => true
+            ]);
+        } elseif($params->applicationId === 25) { // 3 Year Program Application
+            $columns = ['userId'];
+            $values = [$params->userId];
+
+            $normalFields = [
+                'maritalStatus', 'maritalStatusDetails', 'studentType', 'fundingSource',
+                'sponsorName', 'sponsorPhone', 'sponsorAmount', 'studentAmount', 'churchMissionDetails',
+                'reasonToContinue', 'pastorDiscussion', 'ministryCalling', 'currentService',
+                'submissionDate', 'studentSignature', 'admissionStatus', 'facultyDecisionDate'
+            ];
+
+            $booleanFields = [
+                'schoolRegulationsAgreement',
+                'academicDirectorApproval',
+                'generalDirectorApproval'
+            ];
+
+            foreach ($normalFields as $field) {
+                if (property_exists($params->application, $field)) {
+                    $columns[] = $field;
+                    $val = $params->application->$field;
+                    $values[] = ($val === '' ? null : $val);
+                }
+            }
+
+            foreach ($booleanFields as $field) {
+                if (property_exists($params->application, $field)) {
+                    $columns[] = $field;
+                    $val = $params->application->$field;
+                    $values[] = ($val === null || $val === '' ? null : ($val ? 1 : 0));
+                }
+            }
+
+            $result = $this->db2->sql([
+                'statement' => 'INSERT INTO',
+                'table' => 'admin_applications_three_year',
+                'columns' => $columns,
+                'values' => $values,
+                'update' => true
+            ]);
         } else {
             dbg('Application ID: '.$params->applicationId);
         }
@@ -1551,6 +1753,12 @@ class Applications {
         } elseif($params->applicationId === 23) { // General Application
             array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'General Application']);
             array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Γενική Αίτηση']);
+        } elseif($params->applicationId === 24) { // General Registration
+            array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'General Registration']);
+            array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Δεύτερο Στάδιο Εγγραφής']);
+        } elseif($params->applicationId === 25) { // 3 Year Program Application
+            array_push($notificationOptions["vars"], ['applicationFormTitleEn', '3 Year Program Application']);
+            array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Αίτηση Τριετούς Προγράμματος']);
         }
 
         if($isApplicant){ // User is an Applicant
