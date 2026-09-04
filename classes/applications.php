@@ -794,8 +794,19 @@ class Applications {
                 'greekLoad',
                 'greekResidence',
                 'ispTrack',
+                'ispLoad',
+                'ispResidence',
                 'coursesFirstSemester',
+                'course1Sem1',
+                'course2Sem1',
+                'course3Sem1',
+                'course4Sem1',
                 'coursesSecondSemester',
+                'course1Sem2',
+                'course2Sem2',
+                'course3Sem2',
+                'course4Sem2',
+                'coursesOther',
                 'coursesAuditor',
                 'hasContagiousDisease',
                 'contagiousDiseaseDetails',
@@ -804,7 +815,8 @@ class Applications {
                 'acceptStudentManual',
                 'acceptOnlineManual',
                 'acceptPrivacyPolicy',
-                'financialLiabilityApproval'
+                'financialLiabilityApproval',
+                'financialNotes'
             ];
             $joins = [
                 'JOIN admin_users ON userId = admin_users.id',
@@ -846,36 +858,36 @@ class Applications {
                 $params->userId = $this->user->id;
             }
             $columns = [
-                'applicationStatus',
-                'firstName',
-                'lastName',
-                'email',
-                'phone',
-                'birthDate',
-                'birthPlace',
-                'address',
-                'city',
-                'zipCode',
-                'maritalStatus',
-                'maritalStatusDetails',
-                'studentType',
-                'fundingSource',
-                'sponsorName',
-                'sponsorPhone',
-                'sponsorAmount',
-                'studentAmount',
-                'churchMissionDetails',
-                'reasonToContinue',
-                'pastorDiscussion',
-                'ministryCalling',
-                'currentService',
-                'schoolRegulationsAgreement',
-                'submissionDate',
-                'studentSignature',
-                'academicDirectorApproval',
-                'generalDirectorApproval',
-                'admissionStatus',
-                'facultyDecisionDate'
+                'admin_user_applications.applicationStatus',
+                'admin_users.firstName',
+                'admin_users.lastName',
+                'admin_users.email',
+                'admin_applications_general.birthDate',
+                'admin_applications_general.birthPlace',
+                'COALESCE(admin_applications_three_year.phone, admin_applications_general.phone) AS phone',
+                'COALESCE(admin_applications_three_year.address, admin_applications_general.address) AS address',
+                'COALESCE(admin_applications_three_year.city, admin_applications_general.city) AS city',
+                'COALESCE(admin_applications_three_year.zipCode, admin_applications_general.zipCode) AS zipCode',
+                'COALESCE(admin_applications_three_year.maritalStatus, admin_applications_general.familyStatus) AS maritalStatus',
+                'admin_applications_three_year.maritalStatusDetails',
+                'admin_applications_three_year.studentType',
+                'admin_applications_three_year.fundingSource',
+                'admin_applications_three_year.sponsorName',
+                'admin_applications_three_year.sponsorPhone',
+                'admin_applications_three_year.sponsorAmount',
+                'admin_applications_three_year.studentAmount',
+                'admin_applications_three_year.churchMissionDetails',
+                'admin_applications_three_year.reasonToContinue',
+                'admin_applications_three_year.pastorDiscussion',
+                'admin_applications_three_year.ministryCalling',
+                'admin_applications_three_year.currentService',
+                'admin_applications_three_year.schoolRegulationsAgreement',
+                'admin_applications_three_year.submissionDate',
+                'admin_applications_three_year.studentSignature',
+                'admin_applications_three_year.academicDirectorApproval',
+                'admin_applications_three_year.generalDirectorApproval',
+                'admin_applications_three_year.admissionStatus',
+                'admin_applications_three_year.facultyDecisionDate'
             ];
             $joins = [
                 'JOIN admin_users ON userId = admin_users.id',
@@ -897,6 +909,9 @@ class Applications {
                 ];
                 foreach ($booleanFields as $field) {
                     $return["application"]->$field = isset($return["application"]->$field) ? booleanize($return["application"]->$field) : null;
+                }
+                if (empty($return["application"]->submissionDate) || $return["application"]->applicationStatus != 1) {
+                    $return["application"]->submissionDate = date('d-m-Y');
                 }
             }
             return new AjaxResponse($return);
@@ -1589,9 +1604,16 @@ class Applications {
 
             $normalFields = [
                 'studyMode', 'greekTrack', 'greekDuration', 'greekLoad', 'greekResidence', 'ispTrack',
-                'coursesFirstSemester', 'coursesSecondSemester', 'coursesAuditor',
+                'ispLoad', 'ispResidence',
+                'coursesFirstSemester',
+                'course1Sem1', 'course2Sem1', 'course3Sem1', 'course4Sem1',
+                'coursesSecondSemester',
+                'course1Sem2', 'course2Sem2', 'course3Sem2', 'course4Sem2',
+                'coursesOther',
+                'coursesAuditor',
                 'contagiousDiseaseDetails', 'medicalTreatmentDetails', 'foodAllergies',
-                'hasContagiousDisease'
+                'hasContagiousDisease',
+                'financialNotes'
             ];
 
             $booleanFields = [
@@ -1632,7 +1654,8 @@ class Applications {
                 'maritalStatus', 'maritalStatusDetails', 'studentType', 'fundingSource',
                 'sponsorName', 'sponsorPhone', 'sponsorAmount', 'studentAmount', 'churchMissionDetails',
                 'reasonToContinue', 'pastorDiscussion', 'ministryCalling', 'currentService',
-                'submissionDate', 'studentSignature', 'admissionStatus', 'facultyDecisionDate'
+                'submissionDate', 'studentSignature', 'admissionStatus', 'facultyDecisionDate',
+                'phone', 'address', 'city', 'zipCode'
             ];
 
             $booleanFields = [
