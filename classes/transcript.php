@@ -409,8 +409,7 @@ class Transcript
 
             $pdf->Ln(10);
             $pdf->SetFont('Cardo', '', 10);
-            // $pdf->MultiCell(0, 4, "This transcript was released by the Registrar’s office of the Greek Bible College in a sealed envelope.\n\rIt is certified only if received unopened with the school seal on the lip of the envelope.\n\r\n\rThe Greek Bible College is accredited by the European Council for Theological Education (ECTE), a member of the International Council for Evangelical Theological Education (ICETE)", 0);
-            $pdf->MultiCell(0, 4, "This transcript was released by the Registrar’s office of the Greek Bible College in a sealed envelope.\n\rIt is certified only if received unopened with the school seal on the lip of the envelope.\n\r\n\rThe Greek Bible College is accredited by the European Council for Theological Education (former European Evangelical Accrediting Association). The ECTE is a quality assurance registered on the European Quality Assurance Register (EQAR).", 0);
+            $pdf->MultiCell(0, 4, "This transcript was released by the Registrar’s office of the Greek Bible College in a sealed envelope.\n\rIt is certified only if received unopened with the school seal on the lip of the envelope.\n\r\n\rThe Greek Bible College is accredited at level 6, by the European Council for Theological Education. The ECTE is a quality assurance registered on the European Quality Assurance Register (EQAR).", 0);
 
             $pdf->Ln(5);
             $pdf->SetFont('Cardo', '', 10);
