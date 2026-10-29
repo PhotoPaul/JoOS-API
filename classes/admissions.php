@@ -46,13 +46,13 @@ class Admissions {
                 'LEFT JOIN (SELECT candidateId, vote FROM admin_admissions WHERE userId = ?) AS admin_admissions_filtered ON admin_users.id = admin_admissions_filtered.candidateId'
             ],
             'where' => [
-                ((!isset($params->filter) || $params->filter->programId === '0' || $params->filter->programId === null) ?
+                ((!isset($params->filter) || !isset($params->filter->programId) || $params->filter->programId === '0' || $params->filter->programId === null) ?
                     'forProgramId IS NOT NULL OR (FALSE AND ?)' :
                 ($params->filter->programId === '-1' ?
                     'forProgramId IS NULL OR (FALSE AND ?)' :
                     'forProgramId = ?'
                 )).' AND (roleId = 5 OR roleId = 6)',
-                [$this->user->id, isset($params->filter->programId) ? $params->filter->programId : null, isset($params->id) ? $params->id : null]
+                [$this->user->id, (isset($params->filter) && isset($params->filter->programId)) ? $params->filter->programId : null, isset($params->id) ? $params->id : null]
             ],
             'order' => 'admin_users.id = ? DESC, admin_users.id DESC, applicationId IS NULL, applicationStatus DESC, applicationId'
         ]);
@@ -509,6 +509,74 @@ class Admissions {
         return new AjaxResponse(["id" => $params->userId]);
     }
 
+    function deleteUserApplication($params) {
+        if (empty($params->userId) || empty($params->applicationId)) {
+            return new AjaxResponse(null, false, 'Invalid parameters');
+        }
+
+        $app = $this->db2->sql([
+            'statement' => 'SELECT',
+            'columns' => 'dbTable',
+            'table' => 'admin_applications',
+            'where' => ['id = ?', $params->applicationId]
+        ]);
+
+        if (!empty($app) && !empty($app[0]->dbTable)) {
+            $dbTable = $app[0]->dbTable;
+
+            // Delete application entries from application table
+            $this->db2->sql([
+                'statement' => 'DELETE FROM',
+                'table' => 'admin_applications_' . $dbTable,
+                'where' => ['userId = ?', $params->userId]
+            ]);
+
+            // If general application or documents application, also clean up uploaded documents
+            if ($dbTable === 'general' || $dbTable === 'documents') {
+                $documents = $this->db2->sql([
+                    'statement' => 'SELECT',
+                    'columns' => 'documentId',
+                    'table' => 'admin_applications_documents',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+                $fs = new FileSystem();
+                foreach ($documents as $doc) {
+                    if (!empty($doc->documentId)) {
+                        $fs->deleteFile((object)['filename' => $doc->documentId]);
+                    }
+                }
+                $this->db2->sql([
+                    'statement' => 'DELETE FROM',
+                    'table' => 'admin_applications_documents',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+            }
+
+            // If general application, also clean references
+            if ($dbTable === 'general') {
+                $this->db2->sql([
+                    'statement' => 'DELETE FROM',
+                    'table' => 'admin_applications_references',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+                $this->db2->sql([
+                    'statement' => 'DELETE FROM',
+                    'table' => 'admin_applications_isp_references',
+                    'where' => ['userId = ?', $params->userId]
+                ]);
+            }
+        }
+
+        // Delete from admin_user_applications
+        $this->db2->sql([
+            'statement' => 'DELETE FROM',
+            'table' => 'admin_user_applications',
+            'where' => ['userId = ? AND applicationId = ?', [$params->userId, $params->applicationId]]
+        ]);
+
+        return new AjaxResponse(["userId" => $params->userId, "applicationId" => $params->applicationId]);
+    }
+
     function promoteCandidateToStudent($params){
         // Add student role to user
         $this->db2->sql([
@@ -540,6 +608,51 @@ class Admissions {
         $sql = 'INSERT INTO admin_user_profiles (id, birthDate, phone, greekCitizen, greekIdNumber, greekSsn, irsOffice, citizenship, euCitizen, passportNumber, residencePermit, address, city, zipCode, country) SELECT id, birthDate, phone, greekCitizen, greekIdNumber, greekSsn, irsOffice, citizenship, euCitizen, passportNumber, residencePermit, address, city, zipCode, country FROM admin_applications_personal t WHERE id = ? ON DUPLICATE KEY UPDATE birthDate = t.birthDate, phone = t.phone, greekCitizen = t.greekCitizen, greekIdNumber = t.greekIdNumber, greekSsn = t.greekSsn, irsOffice = t.irsOffice, citizenship = t.citizenship, euCitizen = t.euCitizen, passportNumber = t.passportNumber, residencePermit = t.residencePermit, address = t.address, city = t.city, zipCode = t.zipCode, country = t.country;';
         $replaceStatement = $this->db->prepare($sql);
         $result = $replaceStatement->execute([$id]);
+    }
+
+    function getAvailableApplications(){
+        $applications = $this->db2->sql([
+            'statement' => 'SELECT',
+            'columns' => ['id', 'heading_gr', 'heading_en', 'icon'],
+            'table' => 'admin_applications',
+            'order' => 'id'
+        ]);
+        return new AjaxResponse($applications);
+    }
+
+    function addUserApplication($params){
+        if (!isset($params->userId) || !isset($params->applicationId)) {
+            return new AjaxError('Missing required parameters.');
+        }
+
+        $userId = (int) $params->userId;
+        $applicationId = (int) $params->applicationId;
+
+        // Check if user already has this application
+        $exists = $this->db2->sql1([
+            'statement' => 'SELECT',
+            'columns' => ['userId'],
+            'table' => 'admin_user_applications',
+            'where' => ['userId = ? AND applicationId = ?', [$userId, $applicationId]]
+        ]);
+
+        if ($exists) {
+            return new AjaxError('Application already exists for this candidate.');
+        }
+
+        // Insert new user application with initial status 0 (not submitted)
+        $this->db2->sql([
+            'statement' => 'INSERT INTO',
+            'table' => 'admin_user_applications',
+            'columns' => ['userId', 'applicationId', 'applicationStatus', 'hidden'],
+            'values' => [$userId, $applicationId, '0', 0]
+        ]);
+
+        return new AjaxResponse([
+            'success' => true,
+            'userId' => $userId,
+            'applicationId' => $applicationId
+        ]);
     }
 
     function removeCandidateRole($params){
