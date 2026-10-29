@@ -816,10 +816,11 @@ class Applications {
                 'acceptOnlineManual',
                 'acceptPrivacyPolicy',
                 'financialLiabilityApproval',
-                'financialNotes'
+                'financialNotes',
+                'financialCost'
             ];
             $joins = [
-                'JOIN admin_users ON userId = admin_users.id',
+                'JOIN admin_users ON admin_users.id = admin_user_applications.userId',
                 'LEFT JOIN admin_applications_registration ON admin_applications_registration.userId = admin_user_applications.userId'
             ];
             $return["application"] = $this->db2->sql1([
@@ -1613,7 +1614,8 @@ class Applications {
                 'coursesAuditor',
                 'contagiousDiseaseDetails', 'medicalTreatmentDetails', 'foodAllergies',
                 'hasContagiousDisease',
-                'financialNotes'
+                'financialNotes',
+                'financialCost'
             ];
 
             $booleanFields = [
