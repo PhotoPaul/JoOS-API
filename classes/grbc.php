@@ -209,6 +209,107 @@ class GrBC {
         return new AjaxResponse($result);
     }
 
+    function getDPOReport(){
+        $results = $this->db->sql([
+            'statement' => 'SELECT',
+            'columns' => [
+                'admin_users.id',
+                'admin_users.firstName',
+                'admin_users.lastName',
+                'admin_users.email',
+                'admin_users.date_time dateTime',
+                'admin_roles.id roleId',
+                'admin_roles.title_gr role_gr',
+                'admin_roles.title_en role_en',
+                'admin_programs.id programId',
+                'admin_programs.program_name_gr',
+                'admin_programs.program_name_en',
+                'admin_applications_registration.acceptPrivacyPolicy',
+                'admin_user_applications.applicationStatus registrationStatus'
+            ],
+            'table' => 'admin_user_roles',
+            'joins' => [
+                'JOIN admin_users ON admin_users.id = admin_user_roles.userId',
+                'JOIN admin_roles ON admin_roles.id = admin_user_roles.roleId',
+                'LEFT JOIN admin_programs ON admin_programs.id = admin_user_roles.forProgramId',
+                'LEFT JOIN admin_applications_registration ON admin_applications_registration.userId = admin_users.id',
+                'LEFT JOIN admin_user_applications ON admin_user_applications.userId = admin_users.id AND admin_user_applications.applicationId = 24'
+            ],
+            'where' => 'admin_user_roles.roleId IN (5, 6, 12)',
+            'order' => 'admin_users.lastName, admin_users.firstName'
+        ]);
+
+        $results = JSFDates($results, 'dateTime');
+
+        $grouped = [];
+        foreach ($results as $row) {
+            $id = $row->id;
+            if (!isset($grouped[$id])) {
+                $grouped[$id] = (object)[
+                    'id' => $row->id,
+                    'firstName' => $row->firstName,
+                    'lastName' => $row->lastName,
+                    'email' => $row->email,
+                    'dateTime' => $row->dateTime,
+                    'hasSigned' => (!empty($row->acceptPrivacyPolicy) && ($row->acceptPrivacyPolicy == '1' || $row->acceptPrivacyPolicy === 1 || $row->acceptPrivacyPolicy === true)),
+                    'registrationStatus' => $row->registrationStatus,
+                    'roles' => [],
+                    'programs' => []
+                ];
+            }
+            if (!empty($row->roleId)) {
+                $alreadyAddedRole = false;
+                foreach ($grouped[$id]->roles as $r) {
+                    if ($r->roleId == $row->roleId) {
+                        $alreadyAddedRole = true;
+                        break;
+                    }
+                }
+                if (!$alreadyAddedRole) {
+                    $grouped[$id]->roles[] = (object)[
+                        'roleId' => $row->roleId,
+                        'role_gr' => $row->role_gr,
+                        'role_en' => $row->role_en
+                    ];
+                }
+            }
+            if (!empty($row->programId)) {
+                $alreadyAddedProg = false;
+                foreach ($grouped[$id]->programs as $p) {
+                    if ($p->programId == $row->programId) {
+                        $alreadyAddedProg = true;
+                        break;
+                    }
+                }
+                if (!$alreadyAddedProg) {
+                    $grouped[$id]->programs[] = (object)[
+                        'programId' => $row->programId,
+                        'program_name_gr' => $row->program_name_gr,
+                        'program_name_en' => $row->program_name_en
+                    ];
+                }
+            }
+        }
+
+        $signed = [];
+        $notSigned = [];
+        foreach ($grouped as $student) {
+            if ($student->hasSigned) {
+                $signed[] = $student;
+            } else {
+                $notSigned[] = $student;
+            }
+        }
+
+        return new AjaxResponse([
+            'signed' => array_values($signed),
+            'notSigned' => array_values($notSigned),
+            'totalStudents' => count($grouped),
+            'totalSigned' => count($signed),
+            'totalNotSigned' => count($notSigned)
+        ]);
+    }
+
     function getVariablesData() {
         $data = $this->db->sql([
             'statement' => 'SELECT',
