@@ -1167,6 +1167,55 @@ class AcademicsService {
         return new AjaxResponse($results);
     }
 
+    function getGraduatesData($params){
+        $whereString = '(roleId = 13 OR admin_program_enrollment.graduated = 1)';
+        if (isset($params->programId)) {
+            $where = [
+                ($whereString.= ' AND admin_programs.id = ?'),
+                [$params->programId]
+            ];
+        } else {
+            $where = $whereString;
+        }
+        $results = $this->db->sql([
+            'statement' => 'SELECT',
+            'columns' => [
+                'admin_users.id',
+                'firstName',
+                'lastName',
+                'email',
+                'photoURI',
+                'admin_program_enrollment.date_time dateTime',
+                'admin_program_enrollment.program_id programId',
+                'program_name_gr',
+                'program_name_en',
+                'COUNT(admin_course_enrollment.course_id) noCourses'
+            ],
+            'table' => 'admin_program_enrollment',
+            'joins' => [
+                'LEFT JOIN admin_programs ON admin_programs.id = admin_program_enrollment.program_id',
+                'LEFT JOIN admin_users ON admin_program_enrollment.student_id = admin_users.id',
+                'LEFT JOIN admin_user_profiles ON admin_users.id = admin_user_profiles.id',
+                'LEFT JOIN admin_course_enrollment ON admin_course_enrollment.student_id = admin_users.id',
+                'LEFT JOIN admin_user_roles ON admin_user_roles.userId = admin_users.id'
+            ],
+            'where' => $where,
+            'group' => 'admin_users.id, admin_program_enrollment.program_id',
+            'order' => 'dateTime DESC, lastName, firstName'
+        ]);
+        $results = JSFDates($results, 'dateTime');
+        $results = $this->db->groupResults($results, 'id', ['programs', ['programId', 'program_name_gr', 'program_name_en', 'noCourses']]);
+
+        $urlGenerator = new UrlGenerator();
+        foreach ($results as $student) {
+            $student->pdfUrlEnglish = $urlGenerator->getURL("getStudentTranscriptPDF", ["id" => $student->id, "lang" => "english"]);
+            $student->pdfUrlEnglishECTS = $urlGenerator->getURL("getStudentTranscriptPDF", ["id" => $student->id, "lang" => "englishECTS"]);
+            $student->pdfUrlGreek = $urlGenerator->getURL("getStudentTranscriptPDF", ["id" => $student->id, "lang" => "greek"]);
+        }
+
+        return new AjaxResponse($results);
+    }
+
     function getCoursesForStudent($params){
         if (!$params->id || !$this->auth->authenticateOperation('getCoursesForStudentOtherThanSelf')) {
             $params->id = $this->user->id;

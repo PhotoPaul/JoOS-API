@@ -192,4 +192,143 @@ class AcademicProgress {
 
         return new AjaxResponse($return);
     }
+
+    function graduateStudent($params) {
+        if (empty($params->studentId)) {
+            return new AjaxError('Student ID is required');
+        }
+
+        $graduationDate = !empty($params->graduationDate) ? $params->graduationDate : date("Y-m-d");
+
+        // 1. Mark all program enrollments of this student as graduated
+        $this->db->sql([
+            'statement' => 'UPDATE',
+            'table' => 'admin_program_enrollment',
+            'columns' => ['graduated', 'active', 'date_time'],
+            'values' => [
+                1,
+                0,
+                $graduationDate . ' ' . date("H:i:s")
+            ],
+            'where' => ['student_id = ?', $params->studentId]
+        ]);
+
+        // 2. Fetch program IDs associated with student role (roleId = 6)
+        $userPrograms = $this->db->sql([
+            'statement' => 'SELECT',
+            'columns' => 'forProgramId',
+            'table' => 'admin_user_roles',
+            'where' => ['userId = ? AND roleId = 6', $params->studentId]
+        ]);
+
+        // 3. Remove student role (roleId = 6)
+        $this->db->sql([
+            'statement' => 'DELETE FROM',
+            'table' => 'admin_user_roles',
+            'where' => ['userId = ? AND roleId = 6', $params->studentId]
+        ]);
+
+        // 4. Add graduate role (roleId = 13) for each program (or null)
+        if (!empty($userPrograms)) {
+            foreach ($userPrograms as $prog) {
+                $this->db->sql([
+                    'statement' => 'INSERT INTO',
+                    'table' => 'admin_user_roles',
+                    'columns' => 'userId, roleId, forProgramId',
+                    'values' => [
+                        $params->studentId,
+                        13,
+                        $prog->forProgramId
+                    ],
+                    'update' => true
+                ]);
+            }
+        } else {
+            $this->db->sql([
+                'statement' => 'INSERT INTO',
+                'table' => 'admin_user_roles',
+                'columns' => 'userId, roleId, forProgramId',
+                'values' => [
+                    $params->studentId,
+                    13,
+                    null
+                ],
+                'update' => true
+            ]);
+        }
+
+        return new AjaxResponse([
+            'studentId' => $params->studentId,
+            'graduated' => true,
+            'graduationDate' => $graduationDate
+        ]);
+    }
+
+    function demoteGraduateToStudent($params) {
+        if (empty($params->studentId)) {
+            return new AjaxError('Student ID is required');
+        }
+
+        // 1. Reset program enrollment: graduated = 0, active = 1, clear graduation date to original or enrollment time
+        $this->db->sql([
+            'statement' => 'UPDATE',
+            'table' => 'admin_program_enrollment',
+            'columns' => ['graduated', 'active', 'date_time'],
+            'values' => [
+                0,
+                1,
+                date("Y-m-d H:i:s")
+            ],
+            'where' => ['student_id = ?', $params->studentId]
+        ]);
+
+        // 2. Fetch program IDs associated with graduate role (roleId = 13)
+        $userPrograms = $this->db->sql([
+            'statement' => 'SELECT',
+            'columns' => 'forProgramId',
+            'table' => 'admin_user_roles',
+            'where' => ['userId = ? AND roleId = 13', $params->studentId]
+        ]);
+
+        // 3. Remove graduate role (roleId = 13)
+        $this->db->sql([
+            'statement' => 'DELETE FROM',
+            'table' => 'admin_user_roles',
+            'where' => ['userId = ? AND roleId = 13', $params->studentId]
+        ]);
+
+        // 4. Add student role (roleId = 6) for each program (or null)
+        if (!empty($userPrograms)) {
+            foreach ($userPrograms as $prog) {
+                $this->db->sql([
+                    'statement' => 'INSERT INTO',
+                    'table' => 'admin_user_roles',
+                    'columns' => 'userId, roleId, forProgramId',
+                    'values' => [
+                        $params->studentId,
+                        6,
+                        $prog->forProgramId
+                    ],
+                    'update' => true
+                ]);
+            }
+        } else {
+            $this->db->sql([
+                'statement' => 'INSERT INTO',
+                'table' => 'admin_user_roles',
+                'columns' => 'userId, roleId, forProgramId',
+                'values' => [
+                    $params->studentId,
+                    6,
+                    null
+                ],
+                'update' => true
+            ]);
+        }
+
+        return new AjaxResponse([
+            'studentId' => $params->studentId,
+            'graduated' => false
+        ]);
+    }
 }

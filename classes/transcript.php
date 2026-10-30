@@ -119,6 +119,26 @@ class Transcript
             }
         }
 
+        // Check if user is graduated
+        $graduationCheck = $this->db->sql1([
+            'statement' => 'SELECT',
+            'columns' => 'graduated, admin_program_enrollment.date_time as graduationDate',
+            'table' => 'admin_program_enrollment',
+            'where' => ['student_id = ? AND (graduated = 1 OR graduated = TRUE)', $params->id]
+        ]);
+        if (!$graduationCheck) {
+            $roleCheck = $this->db->sql1([
+                'statement' => 'SELECT',
+                'columns' => 'roleId',
+                'table' => 'admin_user_roles',
+                'where' => ['userId = ? AND roleId = 13', $params->id]
+            ]);
+            $transcript->isGraduate = !empty($roleCheck);
+        } else {
+            $transcript->isGraduate = true;
+            $transcript->graduationDate = $graduationCheck->graduationDate;
+        }
+
         return new AjaxResponse($transcript);
     }
 
@@ -154,27 +174,27 @@ class Transcript
             }
         }
 
-        function IdLine($pdf, $text, $fontSize, $ln, $bold = false)
+        function IdLine($pdf, $text, $fontSize, $ln, $bold = false, $width = 44)
         {
             if ($bold) {
                 $pdf->SetFont('Cardob', '', $fontSize);
             } else {
                 $pdf->SetFont('Cardo', '', $fontSize);
             }
-            $pdf->Cell(28, 5, $text, 0, 0);
+            $pdf->Cell($width, 5, $text, 0, 0);
             if ($ln) {
                 $pdf->Ln($ln);
             }
         }
 
-        function IdLineGreek($pdf, $text, $fontSize, $ln, $bold = false)
+        function IdLineGreek($pdf, $text, $fontSize, $ln, $bold = false, $width = 44)
         {
             if ($bold) {
                 $pdf->SetFont('Cardob', '', $fontSize);
             } else {
                 $pdf->SetFont('Cardo', '', $fontSize);
             }
-            $pdf->Cell(42, 5, $text, 0, 0);
+            $pdf->Cell($width, 5, $text, 0, 0);
             if ($ln) {
                 $pdf->Ln($ln);
             }
@@ -243,14 +263,22 @@ class Transcript
                 IdLine($pdf, "Student Name: ", 11, 0, true);
                 IdLine($pdf, $transcript->personal->lastName . " " . $transcript->personal->firstName, 11, 0);
                 $pdf->setX(-68);
-                IdLine($pdf, "Date Issued: ", 11, 0, true);
+                IdLine($pdf, "Date Issued: ", 11, 0, true, 28);
                 IdLine($pdf, date("j F Y"), 11, 4);
                 IdLine($pdf, "Student ID: ", 11, 0, true);
                 IdLine($pdf, $transcript->personal->id, 11, 4);
                 IdLine($pdf, "Date of Birth: ", 11, 0, true);
                 IdLine($pdf, date("j F Y", strtotime($transcript->personal->birthDate)), 11, 4);
                 IdLine($pdf, "Major: ", 11, 0, true);
-                IdLine($pdf, "Religion/Biblical Studies", 11, 12);
+                if (!empty($transcript->isGraduate)) {
+                    IdLine($pdf, "Religion/Biblical Studies", 11, 4);
+                    IdLine($pdf, "Award: ", 11, 0, true);
+                    IdLine($pdf, "Certificate of Biblical Studies", 11, 4);
+                    IdLine($pdf, "Level of Qualification: ", 11, 0, true);
+                    IdLine($pdf, "EQF level 6 comparable to First Cycle of studies (comp. Bachelor of Theology)", 11, 12, false, 0);
+                } else {
+                    IdLine($pdf, "Religion/Biblical Studies", 11, 12);
+                }
             } elseif ($language === 'greek') {
                 IdLineGreek($pdf, "Ονοματεπώνυμο: ", 11, 0, true);
                 IdLineGreek($pdf, $transcript->personal->lastName . " " . $transcript->personal->firstName, 11, 0);
@@ -263,7 +291,15 @@ class Transcript
                 IdLineGreek($pdf, "Ημερομηνία γέννησης: ", 11, 0, true);
                 IdLineGreek($pdf, fDate($transcript->personal->birthDate), 11, 4);
                 IdLineGreek($pdf, "Πρόγραμμα Σπουδών: ", 11, 0, true);
-                IdLineGreek($pdf, "Θεολογία/Βιβλικές Σπουδές", 11, 12);
+                if (!empty($transcript->isGraduate)) {
+                    IdLineGreek($pdf, "Θεολογία/Βιβλικές Σπουδές", 11, 4);
+                    IdLineGreek($pdf, "Τίτλος Σπουδών: ", 11, 0, true);
+                    IdLineGreek($pdf, "Πιστοποιητικό Βιβλικών Σπουδών", 11, 4);
+                    IdLineGreek($pdf, "Επίπεδο Προσόντων: ", 11, 0, true);
+                    IdLineGreek($pdf, "EQF επίπεδο 6 αντίστοιχο του Πρώτου Κύκλου σπουδών (αντίστ. Bachelor of Theology)", 11, 12, false, 0);
+                } else {
+                    IdLineGreek($pdf, "Θεολογία/Βιβλικές Σπουδές", 11, 12);
+                }
             }
 
             $totalCreditsEarned = 0;
@@ -346,7 +382,7 @@ class Transcript
                     $semesterPointAverage = $semesterPointAverage / ($semesterCoursesCompleted !== 0 ? $semesterCoursesCompleted : 1);
                 }
 
-                TableHeader($pdf, "{{nodash}}", 30, '', 0);
+                TableHeader($pdf, "", 30, '', 0);
                 if ($language === 'english' || $language === 'englishECTS') {
                     TableHeader($pdf, "Semester hours", 110, 'R', 0);
                 } elseif ($language === 'greek') {
@@ -367,22 +403,22 @@ class Transcript
             $greatPointAverage = $totalCoursesCompleted !== 0 ? $greatPointAverage / $totalCoursesCompleted : 0;
 
             $pdf->Ln(5);
-            TableHeader($pdf, "{{nodash}}", 30, '', 0);
+            TableHeader($pdf, "", 30, '', 0);
             if ($language === 'english' || $language === 'englishECTS') {
                 TableHeader($pdf, "Total Semester hours", 110, 'R', 0);
             } elseif ($language === 'greek') {
                 TableHeader($pdf, "Σύνολο Εξαμηνιαίων Ωρών", 110, 'R', 0);
             }
             TableHeader($pdf, "" . $totalCreditsEarned, 30, 'C');
-            TableHeader($pdf, "{{nodash}}", 20, 'C', 0);
+            TableHeader($pdf, "", 20, 'C', 0);
             $pdf->Ln(5);
-            TableHeader($pdf, "{{nodash}}", 30, '', 0);
+            TableHeader($pdf, "", 30, '', 0);
             if ($language === 'english' || $language === 'englishECTS') {
                 TableHeader($pdf, "Grade Point Average", 110, 'R', 0);
             } elseif ($language === 'greek') {
                 TableHeader($pdf, "Μέσος Όρος Βαθμών", 110, 'R', 0);
             }
-            TableHeader($pdf, "{{nodash}}", 30, 'C', 0);
+            TableHeader($pdf, "", 30, 'C', 0);
             if ($language === 'english' || $language === 'englishECTS') {
                 TableHeader($pdf, "" . fGrade($greatPointAverage, 'c'), 20, 'C');
             } elseif ($language === 'greek') {
@@ -391,19 +427,36 @@ class Transcript
             $pdf->Ln(5);
 
             $pdf->Ln(5);
-            $pdf->Cell(30, 10, "The student has not completed the program", 0);
+            if (!empty($transcript->isGraduate)) {
+                $graduationDateTimestamp = !empty($transcript->graduationDate) ? strtotime($transcript->graduationDate) : time();
+                if ($language === 'english' || $language === 'englishECTS') {
+                    $formattedGradDate = date("jS \of F, Y", $graduationDateTimestamp);
+                    $pdf->Cell(30, 5, "The student has completed the program", 0, 1);
+                    $pdf->Cell(30, 5, "Graduation Date: " . $formattedGradDate, 0, 1);
+                } elseif ($language === 'greek') {
+                    $formattedGradDate = fDate(date("Y-m-d", $graduationDateTimestamp), "%d %B %Y");
+                    $pdf->Cell(30, 5, "Ο/Η φοιτητής/ρια έχει ολοκληρώσει το πρόγραμμα", 0, 1);
+                    $pdf->Cell(30, 5, "Ημερομηνία Αποφοίτησης: " . $formattedGradDate, 0, 1);
+                }
+            } else {
+                if ($language === 'english' || $language === 'englishECTS') {
+                    $pdf->Cell(30, 10, "The student has not completed the program", 0, 1);
+                } elseif ($language === 'greek') {
+                    $pdf->Cell(30, 10, "Ο/Η φοιτητής/ρια δεν έχει ολοκληρώσει το πρόγραμμα", 0, 1);
+                }
+            }
             if ($language === 'english' || $language === 'englishECTS') {
-                $pdf->Ln(5);
+                $pdf->Ln(2);
                 $pdf->Cell(30, 10, "GPA is based on ", 0);
                 $pdf->Cell(30, 10, "A = 4", 0);
                 $pdf->Ln(5);
-                $pdf->Cell(30, 10, "{{nodash}}", 0);
+                $pdf->Cell(30, 10, "", 0);
                 $pdf->Cell(30, 10, "B = 3", 0);
                 $pdf->Ln(5);
-                $pdf->Cell(30, 10, "{{nodash}}", 0);
+                $pdf->Cell(30, 10, "", 0);
                 $pdf->Cell(30, 10, "C = 2", 0);
                 $pdf->Ln(5);
-                $pdf->Cell(30, 10, "{{nodash}}", 0);
+                $pdf->Cell(30, 10, "", 0);
                 $pdf->Cell(30, 10, "D = 1", 0);
             }
 
@@ -417,7 +470,7 @@ class Transcript
 
             $pdf->Ln(15);
             $pdf->SetFont('Cardob', '', 10);
-            $pdf->Cell(60, 10, "{{nodash}}", 0, 0, 'C');
+            $pdf->Cell(60, 10, "", 0, 0, 'C');
             $pdf->Cell(80, 10, "Academic Dean", 0, 0, 'C');
             HR($pdf);
             $pdf->Ln(10);
