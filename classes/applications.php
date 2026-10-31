@@ -817,7 +817,14 @@ class Applications {
                 'acceptPrivacyPolicy',
                 'financialLiabilityApproval',
                 'financialNotes',
-                'financialCost'
+                'financialCost',
+                'studentType',
+                'fundingSource',
+                'sponsorName',
+                'sponsorPhone',
+                'sponsorAmount',
+                'studentAmount',
+                'churchMissionDetails'
             ];
             $joins = [
                 'JOIN admin_users ON admin_users.id = admin_user_applications.userId',
@@ -1615,7 +1622,14 @@ class Applications {
                 'contagiousDiseaseDetails', 'medicalTreatmentDetails', 'foodAllergies',
                 'hasContagiousDisease',
                 'financialNotes',
-                'financialCost'
+                'financialCost',
+                'studentType',
+                'fundingSource',
+                'sponsorName',
+                'sponsorPhone',
+                'sponsorAmount',
+                'studentAmount',
+                'churchMissionDetails'
             ];
 
             $booleanFields = [
