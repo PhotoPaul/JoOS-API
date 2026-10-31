@@ -186,34 +186,73 @@ class PDFService {
 
     function generateQuestionsAnswers($questions, $language) {
         foreach($questions as $key => $question) {
-            $this->pdf->SetFont('Calibrib','b',14);
-                $this->pdf->MultiCell(190,8,($key+1).". ".$question->{'title_'.$language});
-            $this->pdf->SetFont('Calibri','',14);
-            if(isset($question->children)) {
-                $this->HR(true, 0);
-                $noChildren = count($question->children);
-                foreach($question->children as $i => $child) {
-                    if($i % 4 === 3) {
-                        $this->HR();
+            // Check remaining space on page to prevent orphaned question headers
+            if ($this->pdf->GetY() > 240) {
+                $this->pdf->AddPage();
+            }
+
+            $this->pdf->SetFont('Calibrib','b',12);
+                $this->pdf->MultiCell(190,6,($key+1).". ".$question->{'title_'.$language});
+            $this->pdf->SetFont('Calibri','',11);
+
+            // Handle Question Type 4: Character & Maturity Assessment Matrix (1-5 rating scale)
+            if (isset($question->type) && ($question->type == '4' || $question->questionId == 12) && isset($question->children)) {
+                $this->pdf->Ln(2);
+                $this->pdf->SetFont('Calibrib','b',10);
+                $this->pdf->Cell(115,7,$language === 'gr' ? 'Χαρακτηριστικό' : 'Characteristic',1,0,'L');
+                $this->pdf->Cell(15,7,'1',1,0,'C');
+                $this->pdf->Cell(15,7,'2',1,0,'C');
+                $this->pdf->Cell(15,7,'3',1,0,'C');
+                $this->pdf->Cell(15,7,'4',1,0,'C');
+                $this->pdf->Cell(15,7,'5',1,1,'C');
+                $this->pdf->SetFont('Calibri','',10);
+
+                foreach($question->children as $child) {
+                    if ($this->pdf->GetY() > 265) {
+                        $this->pdf->AddPage();
+                        $this->pdf->SetFont('Calibrib','b',10);
+                        $this->pdf->Cell(115,7,$language === 'gr' ? 'Χαρακτηριστικό' : 'Characteristic',1,0,'L');
+                        $this->pdf->Cell(15,7,'1',1,0,'C');
+                        $this->pdf->Cell(15,7,'2',1,0,'C');
+                        $this->pdf->Cell(15,7,'3',1,0,'C');
+                        $this->pdf->Cell(15,7,'4',1,0,'C');
+                        $this->pdf->Cell(15,7,'5',1,1,'C');
+                        $this->pdf->SetFont('Calibri','',10);
                     }
-                    $this->VR(1);
-                    $this->pdf->Cell(5,10,(isset($child->answer) || (isset($question->answer) && $child->questionId === $question->answer)) ? "√" : "");
-                    $this->VR(1);
-                    if($i % 4 !== 3) {
-                        $this->pdf->Cell(42,10,$child->{'title_'.$language});
-                    } else {
-                        // The 4th one needs to be slightly wider (44 instead of 42)
-                        // It also needs a closing VR on the right side
-                        $this->pdf->Cell(44,10,$child->{'title_'.$language});
-                        $this->VR(1);
-                        $this->pdf->Ln(8);
+                    $childAns = isset($child->answer) ? (int)$child->answer : 0;
+                    $this->pdf->Cell(115,7,$child->{'title_'.$language},1,0,'L');
+                    $this->pdf->Cell(15,7,$childAns === 1 ? 'X' : '',1,0,'C');
+                    $this->pdf->Cell(15,7,$childAns === 2 ? 'X' : '',1,0,'C');
+                    $this->pdf->Cell(15,7,$childAns === 3 ? 'X' : '',1,0,'C');
+                    $this->pdf->Cell(15,7,$childAns === 4 ? 'X' : '',1,0,'C');
+                    $this->pdf->Cell(15,7,$childAns === 5 ? 'X' : '',1,1,'C');
+                }
+            } elseif(isset($question->children)) {
+                // Handle questions with options (Vertical checklist list so titles never overflow)
+                $this->pdf->Ln(2);
+                foreach($question->children as $child) {
+                    if ($this->pdf->GetY() > 270) {
+                        $this->pdf->AddPage();
                     }
+                    $isChecked = (isset($child->answer) && $child->answer) || (isset($question->answer) && $child->questionId == $question->answer);
+                    
+                    $this->pdf->SetFont('Calibrib','b',11);
+                    $this->pdf->Cell(6,6,"[".($isChecked ? " X " : "   ")."]",0,0,'L');
+                    $this->pdf->SetFont('Calibri','',11);
+                    $this->pdf->Cell(0,6," ".$child->{'title_'.$language},0,1,'L');
+                }
+
+                // If "Other" choice had an additional text specification
+                if (isset($question->otherAnswer) && !empty($question->otherAnswer)) {
+                    $this->pdf->SetFont('Calibri','i',11);
+                    $otherLabel = ($language === 'gr' ? '   Προσδιορισμός: ' : '   Specification: ');
+                    $this->pdf->MultiCell(190, 6, $otherLabel . $question->otherAnswer);
                 }
             } else {
-                $this->pdf->MultiCell(190, 8, isset($question->answer) ? $question->answer : '');
-                $this->HR();
+                $ans = isset($question->answer) ? (string)$question->answer : '';
+                $this->pdf->MultiCell(190, 6, $ans !== '' ? $ans : '-');
             }
-            $this->pdf->Ln(8);
+            $this->pdf->Ln(6);
         }
     }
 

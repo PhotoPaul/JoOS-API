@@ -1232,9 +1232,18 @@ class Applications {
                 'update' => true
             ]);
         } elseif($params->applicationId === 5) { // Greek References
+            // Check if user has General Application (applicationId 23), use new template (templateId 2)
+            $hasGeneralApp = $this->db2->sql1([
+                'statement' => 'SELECT',
+                'columns' => 'userId',
+                'table' => 'admin_user_applications',
+                'where' => ['userId = ? AND applicationId = 23', $params->userId]
+            ]);
+            $formTemplateId = $hasGeneralApp ? 2 : 1;
+
             $allValues[] = [
                 $params->userId,
-                1,
+                $formTemplateId,
                 isset($params->application[0]->referenceId) ? ($params->application[0]->referenceId === '0' ? null : $params->application[0]->referenceId) : null,
                 isset($params->application[0]->firstName) ? $params->application[0]->firstName : '',
                 isset($params->application[0]->lastName) ? $params->application[0]->lastName : '',
@@ -1248,7 +1257,7 @@ class Applications {
             ];
             $allValues[] = [
                 $params->userId,
-                1,
+                $formTemplateId,
                 isset($params->application[1]->referenceId) ? ($params->application[1]->referenceId === '0' ? null : $params->application[1]->referenceId) : null,
                 isset($params->application[1]->firstName) ? $params->application[1]->firstName : '',
                 isset($params->application[1]->lastName) ? $params->application[1]->lastName : '',
@@ -1262,7 +1271,7 @@ class Applications {
             ];
             $allValues[] = [
                 $params->userId,
-                1,
+                $formTemplateId,
                 isset($params->application[2]->referenceId) ? ($params->application[2]->referenceId === '0' ? null : $params->application[2]->referenceId) : null,
                 isset($params->application[2]->firstName) ? $params->application[2]->firstName : '',
                 isset($params->application[2]->lastName) ? $params->application[2]->lastName : '',
@@ -1971,7 +1980,7 @@ class Applications {
                 $question->childrenIds = explode(',', $question->childrenIds);
                 $where = 'questionId = '.implode(' OR questionId = ', $question->childrenIds);
                 $orderBy = 'ORDER BY FIELD(questionId, '.implode(', ', $question->childrenIds).')';
-                        $sql = 'SELECT questionId, title_en, title_gr, type FROM admin_form_questions WHERE '.$where.';';
+                        $sql = 'SELECT questionId, title_en, title_gr, type FROM admin_form_questions WHERE '.$where.' '.$orderBy.';';
                 $selectStatement = $this->db->prepare($sql);
                 $selectStatement->execute();
                 $question->children = $selectStatement->fetchAll(PDO::FETCH_OBJ);
@@ -1991,11 +2000,11 @@ class Applications {
 
         // Generate Letter of Recommendation Header
         $pdfService->Head($params->formData->meta->{'title_'.$params->language});
-        $pdfService->Title("Στοιχεία Ταυτότητας");
+        $pdfService->Title($params->language === 'gr' ? "Στοιχεία Ταυτότητας" : "Identity Information");
         $pdfService->pdf->SetFont('Calibrib','b',14);
-            $pdfService->pdf->Cell(90,10,"Ονοματεπώνυμο Συντάκτη");
+            $pdfService->pdf->Cell(90,10, $params->language === 'gr' ? "Ονοματεπώνυμο Συντάκτη" : "Recommender's Name");
             $pdfService->VR();
-            $pdfService->pdf->Cell(0,10,"Ονοματεπώνυμο Υποψηφίου");
+            $pdfService->pdf->Cell(0,10, $params->language === 'gr' ? "Ονοματεπώνυμο Υποψηφίου" : "Applicant's Name");
         $pdfService->pdf->Ln(8);
         $pdfService->pdf->SetFont('Calibri','',14);
             $pdfService->pdf->Cell(90,10,$params->formData->meta->referenceLastName.", ".$params->formData->meta->referenceFirstName);
@@ -2003,23 +2012,27 @@ class Applications {
             $pdfService->HR();
         $pdfService->pdf->Ln(8);
         $pdfService->pdf->SetFont('Calibrib','b',14);
-            $pdfService->pdf->Cell(0,10,"Επάγγελμα / Ιδιότητα");
-        $pdfService->pdf->Ln(8);
-        $pdfService->pdf->SetFont('Calibri','',14);
-            $pdfService->pdf->Cell(0,10,$params->formData->meta->occupation);
-            $pdfService->HR();
-        $pdfService->pdf->Ln(8);
-        $pdfService->pdf->SetFont('Calibrib','b',14);
-            $pdfService->pdf->Cell(0,10,"Οδός, αριθμός, Πόλη Τ.Κ., Χώρα");
-        $pdfService->pdf->Ln(8);
-        $pdfService->pdf->SetFont('Calibri','',14);
-            $pdfService->pdf->Cell(0,10,$params->formData->meta->address.", ".$params->formData->meta->cityZipCountry);
-            $pdfService->HR();
-        $pdfService->pdf->Ln(8);
-        $pdfService->pdf->SetFont('Calibrib','b',14);
-            $pdfService->pdf->Cell(90,10,"Τηλέφωνο");
+            $pdfService->pdf->Cell(90,10, $params->language === 'gr' ? "Επάγγελμα / Ιδιότητα" : "Position / Role");
             $pdfService->VR();
-            $pdfService->pdf->Cell(0,10,"Email");
+            $pdfService->pdf->Cell(0,10, $params->language === 'gr' ? "Εκκλησία / Οργανισμός" : "Church / Organization");
+        $pdfService->pdf->Ln(8);
+        $pdfService->pdf->SetFont('Calibri','',14);
+            $pdfService->pdf->Cell(90,10, $params->formData->meta->occupation ?? '');
+            $pdfService->pdf->Cell(0,10, $params->formData->meta->churchOrganization ?? '');
+            $pdfService->HR();
+        $pdfService->pdf->Ln(8);
+        $pdfService->pdf->SetFont('Calibrib','b',14);
+            $pdfService->pdf->Cell(0,10, $params->language === 'gr' ? "Οδός, αριθμός, Πόλη Τ.Κ., Χώρα" : "Address, City, Postal Code, Country");
+        $pdfService->pdf->Ln(8);
+        $pdfService->pdf->SetFont('Calibri','',14);
+            $fullAddress = trim(($params->formData->meta->address ?? '') . ($params->formData->meta->cityZipCountry ? ", " . $params->formData->meta->cityZipCountry : ''));
+            $pdfService->pdf->Cell(0,10, $fullAddress !== '' ? $fullAddress : '-');
+            $pdfService->HR();
+        $pdfService->pdf->Ln(8);
+        $pdfService->pdf->SetFont('Calibrib','b',14);
+            $pdfService->pdf->Cell(90,10, $params->language === 'gr' ? "Τηλέφωνο" : "Phone");
+            $pdfService->VR();
+            $pdfService->pdf->Cell(0,10, $params->language === 'gr' ? "Email" : "Email");
         $pdfService->pdf->Ln(8);
         $pdfService->pdf->SetFont('Calibri','',14);
             $pdfService->pdf->Cell(90,10,$params->formData->meta->phone);
@@ -2028,7 +2041,7 @@ class Applications {
         $pdfService->pdf->Ln(16);
 
         // Generate Letter of Recommendation Questions / Answers
-        $pdfService->Title("Σχετικά με τον/την Υποψήφιο/α");
+        $pdfService->Title($params->language === 'gr' ? "Σχετικά με τον/την Υποψήφιο/α" : "Regarding the Applicant");
         $pdfService->generateQuestionsAnswers($params->formData->questions, $params->language);
 
         $filename = $pdfService->saveFile((object) [
