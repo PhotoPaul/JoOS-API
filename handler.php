@@ -277,13 +277,40 @@ function fDate($date = null, $format = '%d %b. %Y', $locale = 'greek') {
     if(!isset($date)){
         $date = date('Y-m-d');
     }
-    setlocale(LC_CTYPE, $locale);
-    setlocale(LC_TIME, $locale);
+    $ts = is_numeric($date) ? (int)$date : strtotime($date);
+    if(!$ts) return $date;
 
-    $return = iconv('Windows-1253', 'UTF-8', ltrim(strftime($format, strtotime($date)), '0'));
-    // This only works locally
-    $return = str_replace('Μαϊ', 'Μαΐ', $return);
-    // This only works online
-	$return = str_replace('Μάι', 'Μαΐ', $return);
-	return $return;
+    $greek_months = [
+        1 => ['short' => 'Ιαν.', 'full' => 'Ιανουαρίου'],
+        2 => ['short' => 'Φεβ.', 'full' => 'Φεβρουαρίου'],
+        3 => ['short' => 'Μαρ.', 'full' => 'Μαρτίου'],
+        4 => ['short' => 'Απρ.', 'full' => 'Απριλίου'],
+        5 => ['short' => 'Μαΐ.', 'full' => 'Μαΐου'],
+        6 => ['short' => 'Ιουν.', 'full' => 'Ιουνίου'],
+        7 => ['short' => 'Ιουλ.', 'full' => 'Ιουλίου'],
+        8 => ['short' => 'Αυγ.', 'full' => 'Αυγούστου'],
+        9 => ['short' => 'Σεπ.', 'full' => 'Σεπτεμβρίου'],
+        10 => ['short' => 'Οκτ.', 'full' => 'Οκτωβρίου'],
+        11 => ['short' => 'Νοε.', 'full' => 'Νοεμβρίου'],
+        12 => ['short' => 'Δεκ.', 'full' => 'Δεκεμβρίου'],
+    ];
+
+    $d = (int)date('j', $ts);
+    $m = (int)date('n', $ts);
+    $y = date('Y', $ts);
+
+    if (stripos($locale, 'greek') !== false) {
+        if (strpos($format, '%B') !== false) {
+            $monthStr = $greek_months[$m]['full'];
+        } else {
+            $monthStr = $greek_months[$m]['short'];
+        }
+        return "$d $monthStr $y";
+    } else {
+        if (strpos($format, '%B') !== false) {
+            return date('j F Y', $ts);
+        } else {
+            return date('j M. Y', $ts);
+        }
+    }
 }

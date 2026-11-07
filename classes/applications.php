@@ -1232,14 +1232,14 @@ class Applications {
                 'update' => true
             ]);
         } elseif($params->applicationId === 5) { // Greek References
-            // Check if user has General Application (applicationId 23), use new template (templateId 2)
+            // Check if user has General Application (applicationId 23), use new 2026 template (templateId 5)
             $hasGeneralApp = $this->db2->sql1([
                 'statement' => 'SELECT',
                 'columns' => 'userId',
                 'table' => 'admin_user_applications',
                 'where' => ['userId = ? AND applicationId = 23', $params->userId]
             ]);
-            $formTemplateId = $hasGeneralApp ? 2 : 1;
+            $formTemplateId = $hasGeneralApp ? 5 : 1;
 
             $allValues[] = [
                 $params->userId,
