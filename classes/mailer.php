@@ -8,6 +8,7 @@ if(
     file_exists('../libs/gmail/queue/subject.txt')  &&
     file_exists('../libs/gmail/queue/message.txt')
 ){
+    require_once(file_exists('settings.php') ? 'settings.php' : '../settings.php');
     $to = json_decode(file_get_contents('../libs/gmail/queue/to.txt'));
     $subject = file_get_contents('../libs/gmail/queue/subject.txt');
     $message = file_get_contents('../libs/gmail/queue/message.txt');
