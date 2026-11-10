@@ -731,16 +731,17 @@ class Admissions {
 
         // Add Applications to user
         foreach($applications as $application) {
+            $appId = is_object($application) ? $application->applicationId : (is_array($application) ? $application['applicationId'] : (int)$application);
+            $hidden = is_object($application) && isset($application->hidden) ? $application->hidden : 0;
+            if (!$appId) continue;
             $return = $this->db2->sql([
                 'statement' => 'INSERT INTO',
                 'table' => 'admin_user_applications',
                 'columns' => 'userId, applicationId, hidden',
                 'values' => [
                     $userId,
-                    $application->applicationId,
-                    isset($application->hidden) ?
-                        $application->hidden :
-                        0
+                    $appId,
+                    $hidden
                 ],
                 'update' => true
             ]);
