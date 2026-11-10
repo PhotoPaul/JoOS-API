@@ -2,7 +2,9 @@
 
 class Viva {
 	function __construct(){
-		$this->authentication = VIVA_MERCHANT_ID.':'.VIVA_API_KEY;
+		if (defined('VIVA_MERCHANT_ID') && defined('VIVA_API_KEY') && VIVA_MERCHANT_ID !== '***VIVA_MERCHANT_ID***') {
+			$this->authentication = VIVA_MERCHANT_ID.':'.VIVA_API_KEY;
+		}
 	}
 
 	function vivaCreateOrder($params){

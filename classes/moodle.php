@@ -3,12 +3,12 @@
 class Moodle {
 	function __construct() {
         ini_set('default_socket_timeout', 900);
-        if (MODDLE_TOKEN !== '***MODDLE_TOKEN***') {
-            $this->username = MODDLE_USERNAME;
-            $this->password = MODDLE_PASSWORD;
-            $this->service = MODDLE_SERVICE;
+        if (defined('MODDLE_TOKEN') && MODDLE_TOKEN !== '***MODDLE_TOKEN***') {
+            $this->username = defined('MODDLE_USERNAME') ? MODDLE_USERNAME : '';
+            $this->password = defined('MODDLE_PASSWORD') ? MODDLE_PASSWORD : '';
+            $this->service = defined('MODDLE_SERVICE') ? MODDLE_SERVICE : '';
             $this->token = MODDLE_TOKEN;
-            $this->url = MODDLE_URL;
+            $this->url = defined('MODDLE_URL') ? MODDLE_URL : '';
         }
 	}
 
