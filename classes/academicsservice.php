@@ -1200,7 +1200,7 @@ class AcademicsService {
                 'LEFT JOIN admin_user_roles ON admin_user_roles.userId = admin_users.id'
             ],
             'where' => $where,
-            'group' => 'admin_users.id, admin_program_enrollment.program_id',
+            'group' => 'admin_users.id, admin_program_enrollment.program_id, admin_program_enrollment.date_time',
             'order' => 'dateTime DESC, lastName, firstName'
         ]);
         $results = JSFDates($results, 'dateTime');
