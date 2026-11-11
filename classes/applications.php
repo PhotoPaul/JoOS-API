@@ -1802,8 +1802,8 @@ class Applications {
             array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'General Application']);
             array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Γενική Αίτηση']);
         } elseif($params->applicationId === 24) { // General Registration
-            array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'General Registration']);
-            array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Δεύτερο Στάδιο Εγγραφής']);
+            array_push($notificationOptions["vars"], ['applicationFormTitleEn', 'Additional Information']);
+            array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Συμπληρωματικά Στοιχεία']);
         } elseif($params->applicationId === 25) { // 3 Year Program Application
             array_push($notificationOptions["vars"], ['applicationFormTitleEn', '3 Year Program Application']);
             array_push($notificationOptions["vars"], ['applicationFormTitleGr', 'Αίτηση Τριετούς Προγράμματος']);
